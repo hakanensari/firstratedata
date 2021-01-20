@@ -76,6 +76,28 @@ import_data()
 	done < <(find . -name "*.zip")
 }
 
+# This extra step cleans duplicate rows FirstRateData seems to occasionally
+# introduce into its flat files.
+#
+# Consider the following if this approach is not efficient
+# https://wiki.postgresql.org/wiki/Deleting_duplicates
+delete_duplicates()
+{
+	for table in assets indices; do
+		psql -q $destination <<-SQL
+			DELETE FROM $table a USING (
+				SELECT MIN(ctid) as ctid, symbol, datetime
+					FROM $table
+					GROUP BY symbol, datetime
+					HAVING COUNT(*) > 1
+				) b
+				WHERE a.symbol = b.symbol
+				AND a.datetime = b.datetime
+				AND a.ctid <> b.ctid
+		SQL
+	done
+}
+
 index_db()
 {
 	for table in assets indices; do
@@ -99,4 +121,5 @@ if [ `ls -1 *.zip 2>/dev/null | wc -l` == 0 ]; then
 fi
 prepare_db
 import_data
+delete_duplicates
 index_db
