@@ -1,38 +1,17 @@
 #!/bin/bash
 
-create_tables ()
+truncate_tables ()
 {
 	# Some datasets come with apparently-incorrect fractional values for volume,
 	# so for now, I'm defaulting volume to numeric type.
-	psql $database <<-SQL
-		DROP TABLE IF EXISTS stocks_new, etfs_new, indices_new;
-		CREATE TABLE IF NOT EXISTS stocks_new (
-			symbol TEXT,
-			datetime TIMESTAMP,
-			open NUMERIC NOT NULL,
-			high NUMERIC NOT NULL,
-			low NUMERIC NOT NULL,
-			close NUMERIC NOT NULL,
-			volume NUMERIC NOT NULL
-		);
-		CREATE TABLE IF NOT EXISTS etfs_new (
-			symbol TEXT,
-			datetime TIMESTAMP,
-			open NUMERIC NOT NULL,
-			high NUMERIC NOT NULL,
-			low NUMERIC NOT NULL,
-			close NUMERIC NOT NULL,
-			volume NUMERIC NOT NULL
-		);
-		CREATE TABLE IF NOT EXISTS indices_new (
-			symbol TEXT,
-			datetime TIMESTAMP,
-			open NUMERIC NOT NULL,
-			high NUMERIC NOT NULL,
-			low NUMERIC NOT NULL,
-			close NUMERIC NOT NULL
-		);
-	SQL
+	psql -c "TRUNCATE TABLE stocks, etfs, indices" $database
+}
+
+drop_indices ()
+{
+	for table in stocks etfs indices; do
+		psql -c "DROP INDEX IF EXISTS ${table}_symbol_datetime_key" $database
+	done
 }
 
 # This extra step cleans duplicate rows FirstRateData seems to occasionally
@@ -41,9 +20,9 @@ delete_duplicates ()
 {
 	for table in stocks etfs indices; do
 		psql $database <<-SQL
-			DELETE FROM ${table}_new a USING (
+			DELETE FROM $table a USING (
 				SELECT MIN(ctid) as ctid, symbol, datetime
-					FROM ${table}_new
+					FROM $table
 					GROUP BY symbol, datetime
 					HAVING COUNT(*) > 1
 				) b
@@ -58,20 +37,7 @@ delete_duplicates ()
 add_indices ()
 {
 	for table in stocks etfs indices; do
-		psql -c "CREATE UNIQUE INDEX ${table}_new_symbol_datetime_key ON ${table}_new (symbol, datetime)" $database
-	done
-}
-
-rename_tables ()
-{
-	for table in stocks etfs indices; do
-		psql $database <<-SQL
-			DROP TABLE IF EXISTS ${table}_old;
-			ALTER TABLE IF EXISTS $table RENAME TO ${table}_old;
-			ALTER TABLE ${table}_new RENAME TO $table;
-			ALTER INDEX IF EXISTS ${table}_symbol_datetime_key RENAME TO ${table}_old_symbol_datetime_key;
-			ALTER INDEX ${table}_new_symbol_datetime_key RENAME TO ${table}_symbol_datetime_key;
-		SQL
+		psql -c "CREATE UNIQUE INDEX ${table}_symbol_datetime_key ON $table (symbol, datetime)" $database
 	done
 }
 
@@ -117,7 +83,7 @@ import_datasets ()
 			| sed "s/\r//" \
 			| sed "/^$/d" \
 			| sed "s/^/$symbol,/" \
-			| psql -c "COPY ${table}_new FROM STDIN WITH (FORMAT CSV)" $database
+			| psql -c "COPY ${table} FROM STDIN WITH (FORMAT CSV)" $database
 		done < <(unzip -Z1 $collection)
 	done < <(find . -name "*.zip")
 }
@@ -135,8 +101,8 @@ if [[ -z $web || -z $database || -n $3 ]]; then
 fi
 
 download_files
-create_tables
+truncate_tables
+drop_indices
 import_datasets
 delete_duplicates
 add_indices
-rename_tables
