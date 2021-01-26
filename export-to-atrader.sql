@@ -2,13 +2,13 @@
 -- at 9:30AM.
 with opens as (
                    (select symbol,
-                           open
+                           "open"
                     from stocks
                     where symbol = any(regexp_split_to_array({{symbols}}, ',\s*'))
                         and datetime = {{date}}::timestamp + 34200 * interval '1 second' )
                union all
                    (select symbol,
-                           open
+                           "open"
                     from etfs
                     where symbol = any(regexp_split_to_array({{symbols}}, ',\s*'))
                         and datetime = {{date}}::timestamp + 34200 * interval '1 second' ))
@@ -18,11 +18,11 @@ select extract(epoch
        row_number() over () as printcount,
                          'NSDQ' as primary_exchange_name,
                          'NSDQ' as exec_exchange_name,
-                         open as last,
+       "open" as last,
                                  0 as size,
                                  volume as print_size,
 
-    (select open
+    (select "open"
      from opens
      where symbol = assets.symbol
      limit 1) as xopen,
