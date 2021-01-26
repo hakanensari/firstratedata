@@ -37,11 +37,12 @@ from (
            from stocks
            where symbol = any(regexp_split_to_array(upper({{symbols}}), ',\s*'))
                and datetime::date = {{date}}
-               and datetime >= {{date}}::timestamp + 34200 * interval '1 second' )
+               and datetime >= {{date}}::timestamp + 34200 * interval '1 second'
+               and datetime <= {{date}}::timestamp + 57600 * interval '1 second')
       union all
           (select *
            from etfs
            where symbol = any(regexp_split_to_array(upper({{symbols}}), ',\s*'))
                and datetime::date = {{date}}
-               and datetime >= {{date}}::timestamp + 34200 * interval '1 second' )) as assets
+               and datetime >= {{date}}::timestamp + 57600 * interval '1 second' )) as assets
 order by printtime
