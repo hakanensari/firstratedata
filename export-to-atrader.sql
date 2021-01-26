@@ -13,7 +13,7 @@ with opens as (
                     where symbol = any(regexp_split_to_array(upper({{symbols}}), ',\s*'))
                         and datetime = {{date}}::timestamp + 34200 * interval '1 second' ))
 select extract(epoch
-               from (datetime - {{date}}::timestamp)) as printtime,
+               from (datetime - {{date}}::timestamp))::integer as printtime,
        symbol as name,
        row_number() over () as printcount,
                          'NSDQ' as primary_exchange_name,
