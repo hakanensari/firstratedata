@@ -2,8 +2,6 @@
 
 truncate_tables ()
 {
-	# Some datasets come with apparently-incorrect fractional values for volume,
-	# so for now, I'm defaulting volume to numeric type.
 	psql -c "TRUNCATE TABLE stocks, etfs, indices" $database
 }
 
