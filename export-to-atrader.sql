@@ -4,13 +4,13 @@ with opens as (
                    (select symbol,
                            "open"
                     from stocks
-                    where symbol = any(regexp_split_to_array({{symbols}}, ',\s*'))
+                    where symbol = any(regexp_split_to_array(upper({{symbols}}), ',\s*'))
                         and datetime = {{date}}::timestamp + 34200 * interval '1 second' )
                union all
                    (select symbol,
                            "open"
                     from etfs
-                    where symbol = any(regexp_split_to_array({{symbols}}, ',\s*'))
+                    where symbol = any(regexp_split_to_array(upper({{symbols}}), ',\s*'))
                         and datetime = {{date}}::timestamp + 34200 * interval '1 second' ))
 select extract(epoch
                from (datetime - {{date}}::timestamp)) as printtime,
@@ -35,14 +35,14 @@ select extract(epoch
 from (
           (select *
            from stocks
-           where symbol = any(regexp_split_to_array({{symbols}}, ',\s*'))
+           where symbol = any(regexp_split_to_array(upper({{symbols}}), ',\s*'))
                and datetime::date = {{date}}
                and datetime >= {{date}}::timestamp + 34200 * interval '1 second'
            order by datetime)
       union all
           (select *
            from etfs
-           where symbol = any(regexp_split_to_array({{symbols}}, ',\s*'))
+           where symbol = any(regexp_split_to_array(upper({{symbols}}), ',\s*'))
                and datetime::date = {{date}}
                and datetime >= {{date}}::timestamp + 34200 * interval '1 second'
            order by datetime)
