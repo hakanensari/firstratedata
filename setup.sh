@@ -34,6 +34,19 @@ create_tables ()
 	SQL
 }
 
+create_views ()
+{
+	psql $database <<-SQL
+		CREATE OR REPLACE VIEW assets AS
+			SELECT *
+			FROM stocks
+			UNION ALL
+			SELECT *
+			FROM etfs;
+	SQL
+}
+
+
 usage ()
 {
 	echo "usage: setup [database]"
@@ -46,3 +59,4 @@ if [[ -z $database || -n $2 ]]; then
 fi
 
 create_tables
+create_views
