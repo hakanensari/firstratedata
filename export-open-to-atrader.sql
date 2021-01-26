@@ -1,17 +1,11 @@
 -- TODO: We'll need to add more logic to set xopens for stocks that don't open
 -- at 9:30AM.
-with opens as (
-                   (select symbol,
-                           "open"
-                    from stocks
-                    where symbol = any(regexp_split_to_array(upper({{symbols}}), ',\s*'))
-                        and datetime = {{date}}::timestamp + 34200 * interval '1 second' )
-               union all
-                   (select symbol,
-                           "open"
-                    from etfs
-                    where symbol = any(regexp_split_to_array(upper({{symbols}}), ',\s*'))
-                        and datetime = {{date}}::timestamp + 34200 * interval '1 second' ))
+with opens as
+    (select symbol,
+            "open"
+     from assets
+     where symbol = any(regexp_split_to_array(upper({{symbols}}), ',\s*'))
+         and datetime = {{date}}::timestamp + 34200 * interval '1 second' )
 select extract(epoch
                from (datetime - {{date}}::timestamp))::integer as printtime,
        symbol as name,
@@ -32,17 +26,9 @@ select extract(epoch
        0 as pclose,
        ' ' as sale_conditions,
        0 as print_filter
-from (
-          (select *
-           from stocks
-           where symbol = any(regexp_split_to_array(upper({{symbols}}), ',\s*'))
-               and datetime::date = {{date}}
-               and datetime >= {{date}}::timestamp + 34200 * interval '1 second'
-               and datetime <= {{date}}::timestamp + 57600 * interval '1 second')
-      union all
-          (select *
-           from etfs
-           where symbol = any(regexp_split_to_array(upper({{symbols}}), ',\s*'))
-               and datetime::date = {{date}}
-               and datetime >= {{date}}::timestamp + 57600 * interval '1 second' )) as assets
+from assets
+where symbol = any(regexp_split_to_array(upper({{symbols}}), ',\s*'))
+    and datetime::date = {{date}}
+    and datetime >= {{date}}::timestamp + 34200 * interval '1 second'
+    and datetime <= {{date}}::timestamp + 57600 * interval '1 second'
 order by printtime
