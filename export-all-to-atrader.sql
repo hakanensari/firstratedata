@@ -10,25 +10,25 @@ ticks as (
     select extract(epoch from (datetime - {{ date }}::timestamp))::integer as printtime,
         symbol as name,
         open as last,
-        volume as print_size
+        (volume / 4)::int as print_size
     from daily_snapshot
     union all
     select extract(epoch from (datetime - {{ date }}::timestamp))::integer + 15 as printtime,
         symbol as name,
         case when open > close then high else low end as last,
-        volume as print_size
+        (volume / 4)::int as print_size
     from daily_snapshot
     union all
     select extract(epoch from (datetime - {{ date }}::timestamp))::integer + 30 as printtime,
         symbol as name,
         case when open > close then low else high end as last,
-        volume as print_size
+        (volume / 4)::int as print_size
     from daily_snapshot
     union all
     select extract(epoch from (datetime - {{ date }}::timestamp))::integer + 45 as printtime,
         symbol as name,
         close as last,
-        volume as print_size
+        (volume / 4)::int as print_size
     from daily_snapshot
 )
 select printtime,
