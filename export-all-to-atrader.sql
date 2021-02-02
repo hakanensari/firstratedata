@@ -3,29 +3,27 @@ with daily_snapshot as (
     from assets
     where symbol = any(regexp_split_to_array(upper({{ symbols }}), ',\s*'))
         and datetime::date = {{ date }}
-        and datetime >= {{ date }}::timestamp + 34200 * interval '1 second'
-        and datetime <= {{ date }}::timestamp + 57600 * interval '1 second'
 ),
 ticks as (
-    select extract(epoch from (datetime - {{ date }}::timestamp))::integer as printtime,
+    select extract(epoch from datetime::time) as printtime,
         symbol as name,
         open as last,
         (volume / 4)::int as print_size
     from daily_snapshot
     union all
-    select extract(epoch from (datetime - {{ date }}::timestamp))::integer + 15 as printtime,
+    select extract(epoch from datetime::time) + 15 as printtime,
         symbol as name,
         case when open > close then high else low end as last,
         (volume / 4)::int as print_size
     from daily_snapshot
     union all
-    select extract(epoch from (datetime - {{ date }}::timestamp))::integer + 30 as printtime,
+    select extract(epoch from datetime::time) + 30 as printtime,
         symbol as name,
         case when open > close then low else high end as last,
         (volume / 4)::int as print_size
     from daily_snapshot
     union all
-    select extract(epoch from (datetime - {{ date }}::timestamp))::integer + 45 as printtime,
+    select extract(epoch from datetime::time) + 45 as printtime,
         symbol as name,
         close as last,
         (volume / 4)::int as print_size

@@ -1,6 +1,6 @@
 -- TODO: We'll need logic to set xopens for stocks that don't open at 9:30AM?
 
-select extract(epoch from (datetime - {{ date }}::timestamp))::integer as printtime,
+select extract(epoch from datetime::time) as printtime,
     symbol as name,
     (row_number() over (partition by symbol)) as print_count,
     'NSDQ' as primary_exchange_name,
@@ -24,6 +24,4 @@ select extract(epoch from (datetime - {{ date }}::timestamp))::integer as printt
 from assets
 where symbol = any(regexp_split_to_array(upper({{ symbols }}), ',\s*'))
     and datetime::date = {{ date }}
-    and datetime >= {{ date }}::timestamp + 34200 * interval '1 second'
-    and datetime <= {{ date }}::timestamp + 57600 * interval '1 second'
 order by printtime

@@ -40,9 +40,13 @@ create_views ()
 		CREATE OR REPLACE VIEW assets AS
 			SELECT *
 			FROM stocks
+			WHERE EXTRACT(EPOCH FROM datetime::time) >= 34200
+				AND EXTRACT(EPOCH FROM datetime::time) <= 57600
 			UNION ALL
 			SELECT *
-			FROM etfs;
+			FROM etfs
+			WHERE EXTRACT(EPOCH FROM datetime::time) >= 34200
+				AND EXTRACT(EPOCH FROM datetime::time) <= 57600;
 	SQL
 }
 
