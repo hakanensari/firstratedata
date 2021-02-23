@@ -2,12 +2,13 @@
 
 download_files ()
 {
-	while read file_url; do
-		if [[ $file_url =~ readme ]]; then
+	while read url; do
+		file_url=$(curl -sI https://firstratedata.com/$url | grep -oE 'https://.*zip')
+		if [[ $file_url =~ 5min|30min|1hour|UNADJUSTED ]]; then
 			continue
 		fi
-		curl $file_url -O -s &
-	done < <(curl -s $download_url | egrep -o 'https://[[:graph:]]*aws[[:graph:]]*.zip')
+		curl -sO $file_url &
+	done < <(curl -s $download_url | egrep -o '/datafile[^"]*')
 	wait
 }
 
