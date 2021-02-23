@@ -31,7 +31,8 @@ import_datasets ()
 
 		while read dataset; do
 			# TODO: Confirm this correctly extracts all symbols
-			if [[ $dataset =~ (^|/)([A-Z][0-9A-Z.]*)_ ]]; then
+
+			if [[ $dataset =~ (^|[/_])([A-Z][0-9A-Z.]*)_ ]]; then
 				symbol=${BASH_REMATCH[2]}
 			else
 				echo cannot parse $dataset
