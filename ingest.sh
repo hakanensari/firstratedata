@@ -25,6 +25,7 @@ import_datasets ()
 			# TODO: Skip futures for now
 			continue
 		else
+			echo cannot parse $collection
 			exit 1
 		fi
 
@@ -33,6 +34,7 @@ import_datasets ()
 			if [[ $dataset =~ (^|/)([A-Z][0-9A-Z.]*)_ ]]; then
 				symbol=${BASH_REMATCH[2]}
 			else
+				echo cannot parse $dataset
 				exit 1
 			fi
 
