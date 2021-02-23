@@ -15,7 +15,7 @@ drop_indices ()
 import_datasets ()
 {
 	while read collection; do
-		if [[ $collection =~ us_1500 ]]; then
+		if [[ $collection =~ us1500 ]]; then
 			table=stocks
 		elif [[ $collection =~ etf ]]; then
 			table=etfs
