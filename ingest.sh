@@ -2,55 +2,14 @@
 
 truncate_tables ()
 {
-	psql -c "TRUNCATE TABLE stocks, etfs, indices" $database
+	psql -c "TRUNCATE TABLE stocks, etfs, indices" $database_url
 }
 
 drop_indices ()
 {
 	for table in stocks etfs indices; do
-		psql -c "DROP INDEX IF EXISTS ${table}_symbol_datetime_key" $database
+		psql -c "DROP INDEX IF EXISTS ${table}_symbol_datetime_key" $database_url
 	done
-}
-
-# This extra step cleans duplicate rows FirstRateData seems to occasionally
-# introduce into its flat files.
-delete_duplicates ()
-{
-	for table in stocks etfs indices; do
-		psql $database <<-SQL
-			DELETE FROM $table a USING (
-				SELECT MIN(ctid) as ctid, symbol, datetime
-					FROM $table
-					GROUP BY symbol, datetime
-					HAVING COUNT(*) > 1
-				) b
-				WHERE a.symbol = b.symbol
-				AND a.datetime = b.datetime
-				AND a.ctid <> b.ctid
-		SQL
-	done
-}
-
-
-add_indices ()
-{
-	for table in stocks etfs indices; do
-		psql -c "CREATE UNIQUE INDEX ${table}_symbol_datetime_key ON $table (symbol, datetime)" $database
-	done
-}
-
-download_files ()
-{
-	# Don't download again if files are already downloaded
-	if [ `ls -1 *.zip 2>/dev/null | wc -l` == 0 ]; then
-		while read url; do
-			if [[ $url =~ readme ]]; then
-				continue
-			fi
-			curl $url -O -s &
-		done < <(curl -s $web | egrep -o 'https://[[:graph:]]*aws[[:graph:]]*.zip')
-		wait
-	fi
 }
 
 import_datasets ()
@@ -81,24 +40,49 @@ import_datasets ()
 			| sed "s/\r//" \
 			| sed "/^$/d" \
 			| sed "s/^/$symbol,/" \
-			| psql -c "COPY ${table} FROM STDIN WITH (FORMAT CSV)" $database
+			| psql -c "COPY ${table} FROM STDIN WITH (FORMAT CSV)" $database_url
 		done < <(unzip -Z1 $collection)
 	done < <(find . -name "*.zip")
 }
 
-usage ()
+
+# This extra step cleans duplicate rows FirstRateData seems to occasionally
+# introduce into its flat files.
+delete_duplicates ()
 {
-	echo "usage: ingest [web] [database]"
+	for table in stocks etfs indices; do
+		psql $database_url <<-SQL
+			DELETE FROM $table a USING (
+				SELECT MIN(ctid) as ctid, symbol, datetime
+					FROM $table
+					GROUP BY symbol, datetime
+					HAVING COUNT(*) > 1
+				) b
+				WHERE a.symbol = b.symbol
+				AND a.datetime = b.datetime
+				AND a.ctid <> b.ctid
+		SQL
+	done
 }
 
-web=$1
-database=$2
-if [[ -z $web || -z $database || -n $3 ]]; then
+add_indices ()
+{
+	for table in stocks etfs indices; do
+		psql -c "CREATE UNIQUE INDEX ${table}_symbol_datetime_key ON $table (symbol, datetime)" $database_url
+	done
+}
+
+usage ()
+{
+	echo "usage: ingest [database_url]"
+}
+
+database_url=$1
+if [[ -z $database_url || -n $2 ]]; then
 	usage
 	exit 1
 fi
 
-download_files
 truncate_tables
 drop_indices
 import_datasets
