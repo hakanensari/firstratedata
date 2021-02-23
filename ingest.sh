@@ -54,7 +54,7 @@ import_datasets ()
 delete_duplicates ()
 {
 	for table in stocks etfs indices; do
-		psql $database_url <<-SQL
+		psql $database_url <<-SQL &
 			DELETE FROM $table a USING (
 				SELECT MIN(ctid) as ctid, symbol, datetime
 					FROM $table
@@ -66,13 +66,15 @@ delete_duplicates ()
 				AND a.ctid <> b.ctid
 		SQL
 	done
+	wait
 }
 
 add_indices ()
 {
 	for table in stocks etfs indices; do
-		psql -c "CREATE UNIQUE INDEX ${table}_symbol_datetime_key ON $table (symbol, datetime)" $database_url
+		psql -c "CREATE UNIQUE INDEX ${table}_symbol_datetime_key ON $table (symbol, datetime)" $database_url &
 	done
+	wait
 }
 
 usage ()
