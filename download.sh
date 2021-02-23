@@ -2,16 +2,13 @@
 
 download_files ()
 {
-	# Don't download again if files are already downloaded
-	if [ `ls -1 *.zip 2>/dev/null | wc -l` == 0 ]; then
-		while read file_url; do
-			if [[ $file_url =~ readme ]]; then
-				continue
-			fi
-			curl $file_url -O -s &
-		done < <(curl -s $download_url | egrep -o 'https://[[:graph:]]*aws[[:graph:]]*.zip')
-		wait
-	fi
+	while read file_url; do
+		if [[ $file_url =~ readme ]]; then
+			continue
+		fi
+		curl $file_url -O -s &
+	done < <(curl -s $download_url | egrep -o 'https://[[:graph:]]*aws[[:graph:]]*.zip')
+	wait
 }
 
 usage ()
