@@ -1,6 +1,6 @@
 with daily_snapshot as (
     select *
-    from assets
+    from assets_rth
     where symbol = any(regexp_split_to_array(upper({{ symbols }}), ',\s*'))
         and datetime::date = {{ date }}
 ),

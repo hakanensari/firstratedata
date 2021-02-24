@@ -37,16 +37,24 @@ create_tables ()
 create_views ()
 {
 	psql $database <<-SQL
-		CREATE OR REPLACE VIEW assets AS
+		CREATE OR REPLACE VIEW stocks_rth AS
 			SELECT *
 			FROM stocks
 			WHERE EXTRACT(EPOCH FROM datetime::time) >= 34200
-				AND EXTRACT(EPOCH FROM datetime::time) <= 57600
-			UNION ALL
+				AND EXTRACT(EPOCH FROM datetime::time) <= 57600;
+
+		CREATE OR REPLACE VIEW etfs_rth AS
 			SELECT *
 			FROM etfs
 			WHERE EXTRACT(EPOCH FROM datetime::time) >= 34200
 				AND EXTRACT(EPOCH FROM datetime::time) <= 57600;
+
+		CREATE OR REPLACE VIEW assets_rth AS
+			SELECT *
+			FROM stocks_rth
+			UNION ALL
+			SELECT *
+			FROM etfs_rth;
 	SQL
 }
 

@@ -10,8 +10,8 @@ select extract(epoch from datetime::time) as printtime,
     volume as print_size,
     (
         select open
-        from assets t1
-        where symbol = assets.symbol
+        from assets_rth t1
+        where symbol = assets_rth.symbol
             and datetime >= {{ date }}::timestamp + 34200 * interval '1 second'
         limit 1
     ) as xopen,
@@ -21,7 +21,7 @@ select extract(epoch from datetime::time) as printtime,
     0 as pclose,
     ' ' as sale_conditions,
     0 as print_filter
-from assets
+from assets_rth
 where symbol = any(regexp_split_to_array(upper({{ symbols }}), ',\s*'))
     and datetime::date = {{ date }}
 order by printtime
