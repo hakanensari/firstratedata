@@ -55,6 +55,42 @@ create_views ()
 			UNION ALL
 			SELECT *
 			FROM etfs_rth;
+
+		DROP MATERIALIZED VIEW IF EXISTS stocks_rth_1d;
+		CREATE MATERIALIZED VIEW IF NOT EXISTS stocks_rth_1d AS
+			SELECT symbol,
+				datetime,
+				(
+					SELECT open
+					FROM stocks_rth
+					WHERE symbol = stocks_rth_1d_ungrouped.symbol
+					AND datetime::date = stocks_rth_1d_ungrouped.datetime
+					LIMIT 1
+				) AS open,
+				MAX(high) AS high,
+				MIN(low) AS low,
+				(
+					SELECT close
+					FROM stocks_rth
+					WHERE symbol = stocks_rth_1d_ungrouped.symbol
+					AND datetime::date = stocks_rth_1d_ungrouped.datetime
+					ORDER BY datetime DESC
+					LIMIT 1
+				) AS close,
+				SUM(volume)
+			FROM (
+				SELECT symbol,
+					datetime::date as datetime,
+					open,
+					high,
+					low,
+					close,
+					volume
+				FROM stocks_rth
+			) AS stocks_rth_1d_ungrouped
+			GROUP BY symbol, datetime;
+		CREATE UNIQUE INDEX stocks_rth_1d_symbol_datetime_key
+			ON stocks_rth_1d (symbol, datetime);
 	SQL
 }
 
