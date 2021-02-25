@@ -42,7 +42,6 @@ import_datasets ()
 			| sed "/^$/d" \
 			| sed "s/^/$symbol,/" \
 			| psql -c "COPY ${table} FROM STDIN WITH (FORMAT CSV)" $database_url
-			break
 		done < <(unzip -Z1 $collection)
 	done < <(find . -name "*.zip")
 }
