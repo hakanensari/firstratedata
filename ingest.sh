@@ -1,10 +1,5 @@
 #!/bin/bash
 
-truncate_tables ()
-{
-	psql -c "TRUNCATE TABLE stocks, etfs, indices" $database_url
-}
-
 drop_indices ()
 {
 	for table in stocks etfs indices; do
@@ -41,7 +36,7 @@ import_datasets ()
 			| sed "s/\r//" \
 			| sed "/^$/d" \
 			| sed "s/^/$symbol,/" \
-			| psql -c "COPY ${table} FROM STDIN WITH (FORMAT CSV)" $database_url
+			| timescaledb-parallel-copy -connection $database_url -workers 8 -truncate -table $table
 		done < <(unzip -Z1 $collection)
 	done < <(find . -name "*.zip")
 }
@@ -49,7 +44,7 @@ import_datasets ()
 add_indices ()
 {
 	for table in stocks etfs indices; do
-		psql -c "CREATE INDEX ${table}_symbol_datetime_idx ON $table (symbol, datetime DESC)" $database_url &
+		psql -c "CREATE INDEX ${table}_symbol_datetime_idx ON $table (symbol, datetime)" $database_url &
 	done
 	wait
 }
@@ -65,7 +60,6 @@ if [[ -z $database_url || -n $2 ]]; then
 	exit 1
 fi
 
-truncate_tables
 drop_indices
 import_datasets
 add_indices
