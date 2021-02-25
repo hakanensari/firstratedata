@@ -8,7 +8,7 @@ truncate_tables ()
 drop_indices ()
 {
 	for table in stocks etfs indices; do
-		psql -c "DROP INDEX IF EXISTS ${table}_symbol_datetime_key" $database_url
+		psql -c "DROP INDEX IF EXISTS ${table}_symbol_datetime_idx" $database_url
 	done
 }
 
@@ -42,6 +42,7 @@ import_datasets ()
 			| sed "/^$/d" \
 			| sed "s/^/$symbol,/" \
 			| psql -c "COPY ${table} FROM STDIN WITH (FORMAT CSV)" $database_url
+			break
 		done < <(unzip -Z1 $collection)
 	done < <(find . -name "*.zip")
 }
@@ -49,7 +50,7 @@ import_datasets ()
 add_indices ()
 {
 	for table in stocks etfs indices; do
-		psql -c "CREATE INDEX ${table}_symbol_datetime_key ON $table (symbol, datetime DESC)" $database_url &
+		psql -c "CREATE INDEX ${table}_symbol_datetime_idx ON $table (symbol, datetime DESC)" $database_url &
 	done
 	wait
 }
@@ -68,5 +69,4 @@ fi
 truncate_tables
 drop_indices
 import_datasets
-delete_duplicates
 add_indices
