@@ -1,5 +1,10 @@
 #!/bin/bash
 
+truncate_tables ()
+{
+	psql -c "TRUNCATE TABLE stocks, etfs, indices" $database_url
+}
+
 drop_indices ()
 {
 	for table in stocks etfs indices; do
@@ -36,7 +41,7 @@ import_datasets ()
 			| sed "s/\r//" \
 			| sed "/^$/d" \
 			| sed "s/^/$symbol,/" \
-			| timescaledb-parallel-copy -connection $database_url -workers 8 -truncate -table $table
+			| timescaledb-parallel-copy -connection $database_url -workers 8 -table $table
 		done < <(unzip -Z1 $collection)
 	done < <(find . -name "*.zip")
 }
@@ -60,6 +65,7 @@ if [[ -z $database_url || -n $2 ]]; then
 	exit 1
 fi
 
+truncate_tables
 drop_indices
 import_datasets
 add_indices
