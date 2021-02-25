@@ -9,6 +9,7 @@ drop_indices ()
 {
 	for table in stocks etfs indices; do
 		psql -c "DROP INDEX IF EXISTS ${table}_symbol_datetime_idx" $database_url
+		psql -c "DROP INDEX IF EXISTS ${table}_datetime_idx" $database_url
 	done
 }
 
@@ -49,9 +50,9 @@ import_datasets ()
 add_indices ()
 {
 	for table in stocks etfs indices; do
-		psql -c "CREATE INDEX ${table}_symbol_datetime_idx ON $table (symbol, datetime)" $database_url &
+		psql -c "CREATE INDEX ${table}_symbol_datetime_idx ON $table (symbol, datetime DESC)" $database_url
+		psql -c "CREATE INDEX ${table}_datetime_idx ON $table (datetime DESC)" $database_url
 	done
-	wait
 }
 
 usage ()
