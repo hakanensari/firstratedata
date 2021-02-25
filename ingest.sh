@@ -46,31 +46,10 @@ import_datasets ()
 	done < <(find . -name "*.zip")
 }
 
-
-# This extra step cleans duplicate rows FirstRateData seems to occasionally
-# introduce into its flat files.
-delete_duplicates ()
-{
-	for table in stocks etfs indices; do
-		psql $database_url <<-SQL &
-			DELETE FROM $table a USING (
-				SELECT MIN(ctid) as ctid, symbol, datetime
-					FROM $table
-					GROUP BY symbol, datetime
-					HAVING COUNT(*) > 1
-				) b
-				WHERE a.symbol = b.symbol
-				AND a.datetime = b.datetime
-				AND a.ctid <> b.ctid
-		SQL
-	done
-	wait
-}
-
 add_indices ()
 {
 	for table in stocks etfs indices; do
-		psql -c "CREATE UNIQUE INDEX ${table}_symbol_datetime_key ON $table (symbol, datetime)" $database_url &
+		psql -c "CREATE INDEX ${table}_symbol_datetime_key ON $table (symbol, datetime DESC)" $database_url &
 	done
 	wait
 }
