@@ -45,7 +45,7 @@ create_tables ()
 	SQL
 }
 
-create_rth_views ()
+create_stocks_rth_view ()
 {
 	psql $database_url <<-SQL
 		CREATE OR REPLACE VIEW stocks_rth AS
@@ -53,13 +53,23 @@ create_rth_views ()
 			FROM stocks
 			WHERE EXTRACT(EPOCH FROM datetime::time) >= 34200
 				AND EXTRACT(EPOCH FROM datetime::time) <= 57600;
+	SQL
+}
 
+create_etfs_rth_view ()
+{
+	psql $database_url <<-SQL
 		CREATE OR REPLACE VIEW etfs_rth AS
 			SELECT *
 			FROM etfs
 			WHERE EXTRACT(EPOCH FROM datetime::time) >= 34200
 				AND EXTRACT(EPOCH FROM datetime::time) <= 57600;
 
+	SQL
+
+create_assets_rth_view ()
+{
+	psql $database_url <<-SQL
 		CREATE OR REPLACE VIEW assets_rth AS
 			SELECT *
 			FROM stocks_rth
@@ -69,44 +79,68 @@ create_rth_views ()
 	SQL
 }
 
-create_rth_1d_view ()
+create_indices_1d_view ()
+{
+	psql $database_url <<-SQL
+		DROP MATERIALIZED VIEW IF EXISTS indices_1d;
+		CREATE MATERIALIZED VIEW IF NOT EXISTS indices_1d AS
+			SELECT symbol,
+				datetime::DATE::TIMESTAMP as datetime,
+				FIRST(open, datetime) as open,
+				MAX(high) AS high,
+				MIN(low) AS low,
+				LAST(close, datetime) AS close
+			FROM indices
+			GROUP BY 1, 2;
+		CREATE INDEX indices_1d_symbol_datetime_idx ON indices_1d (symbol, datetime);
+	SQL
+}
+
+create_stocks_rth_1d_view ()
 {
 	psql $database_url <<-SQL
 		DROP MATERIALIZED VIEW IF EXISTS stocks_rth_1d;
 		CREATE MATERIALIZED VIEW IF NOT EXISTS stocks_rth_1d AS
 			SELECT symbol,
-				datetime,
-				(
-					SELECT open
-					FROM stocks_rth
-					WHERE symbol = stocks_rth_1d_ungrouped.symbol
-					AND datetime::date = stocks_rth_1d_ungrouped.datetime
-					LIMIT 1
-				) AS open,
+				datetime::DATE::TIMESTAMP as datetime,
+				FIRST(open, datetime) as open,
 				MAX(high) AS high,
 				MIN(low) AS low,
-				(
-					SELECT close
-					FROM stocks_rth
-					WHERE symbol = stocks_rth_1d_ungrouped.symbol
-					AND datetime::date = stocks_rth_1d_ungrouped.datetime
-					ORDER BY datetime DESC
-					LIMIT 1
-				) AS close,
-				SUM(volume)
-			FROM (
-				SELECT symbol,
-					datetime::date as datetime,
-					open,
-					high,
-					low,
-					close,
-					volume
-				FROM stocks_rth
-			) AS stocks_rth_1d_ungrouped
-			GROUP BY symbol, datetime;
-		CREATE UNIQUE INDEX stocks_rth_1d_symbol_datetime_key
-			ON stocks_rth_1d (symbol, datetime);
+				LAST(close, datetime) AS close,
+				SUM(volume) as volume
+			FROM stocks_rth
+			GROUP BY 1, 2;
+		CREATE INDEX stocks_rth_1d_symbol_datetime_idx ON stocks_rth_1d (symbol, datetime);
+	SQL
+}
+
+create_etfs_rth_1d_view ()
+{
+	psql $database_url <<-SQL
+		DROP MATERIALIZED VIEW IF EXISTS etfs_rth_1d;
+		CREATE MATERIALIZED VIEW IF NOT EXISTS etfs_rth_1d AS
+			SELECT symbol,
+				datetime::DATE::TIMESTAMP as datetime,
+				FIRST(open, datetime) as open,
+				MAX(high) AS high,
+				MIN(low) AS low,
+				LAST(close, datetime) AS close,
+				SUM(volume) as volume
+			FROM etfs_rth
+			GROUP BY 1, 2;
+		CREATE INDEX etfs_rth_1d_symbol_datetime_idx ON etfs_rth_1d (symbol, datetime);
+	SQL
+}
+
+create_assets_rth_1d_view ()
+{
+	psql $database_url <<-SQL
+		CREATE OR REPLACE VIEW assets_rth_1d AS
+			SELECT *
+			FROM stocks_rth_1d
+			UNION ALL
+			SELECT *
+			FROM etfs_rth_1d;
 	SQL
 }
 
@@ -123,5 +157,10 @@ fi
 
 enable_timescale
 create_tables
-create_rth_views
-# create_rth_1d_view
+create_stocks_rth_view
+create_etfs_rth_view
+create_assets_rth_view
+create_indices_1d_view
+create_stocks_rth_1d_view
+create_etfs_rth_1d_view
+create_assets_rth_1d_view

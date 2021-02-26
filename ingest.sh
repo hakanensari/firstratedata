@@ -50,9 +50,17 @@ import_datasets ()
 add_indices ()
 {
 	for table in stocks etfs indices; do
-		psql -c "CREATE INDEX ${table}_symbol_datetime_idx ON $table (symbol, datetime DESC)" $database_url
+		psql -c "CREATE INDEX ${table}_symbol_datetime_idx ON $table (symbol, datetime)" $database_url
 		psql -c "CREATE INDEX ${table}_datetime_idx ON $table (datetime DESC)" $database_url
 	done
+	psql -c "ANALYZE" $database_url
+}
+
+refresh_materialized_views ()
+{
+	psql -c "REFRESH MATERIALIZED VIEW indices_1d" $database_url
+	psql -c "REFRESH MATERIALIZED VIEW stocks_rth_1d" $database_url
+	psql -c "REFRESH MATERIALIZED VIEW etfs_rth_1d" $database_url
 }
 
 usage ()
@@ -70,3 +78,4 @@ truncate_tables
 drop_indices
 import_datasets
 add_indices
+refresh_materialized_views
