@@ -5,10 +5,10 @@ enable_timescale ()
 	psql -c "CREATE EXTENSION IF NOT EXISTS timescaledb" $database_url
 }
 
-create_tables ()
+# Some datasets come with apparently-incorrect fractional values for volume,
+# so for now, I'm defaulting volume to numeric type.
+create_stocks_table ()
 {
-	# Some datasets come with apparently-incorrect fractional values for volume,
-	# so for now, I'm defaulting volume to numeric type.
 	psql $database_url <<-SQL
 		CREATE TABLE IF NOT EXISTS stocks (
 			symbol TEXT NOT NULL,
@@ -19,7 +19,13 @@ create_tables ()
 			close NUMERIC NOT NULL,
 			volume NUMERIC NOT NULL
 		);
+		SELECT create_hypertable('stocks', 'datetime');
+	SQL
+}
 
+create_etfs_table ()
+{
+	psql $database_url <<-SQL
 		CREATE TABLE IF NOT EXISTS etfs (
 			symbol TEXT NOT NULL,
 			datetime TIMESTAMP NOT NULL,
@@ -29,7 +35,13 @@ create_tables ()
 			close NUMERIC NOT NULL,
 			volume NUMERIC NOT NULL
 		);
+		SELECT create_hypertable('etfs', 'datetime');
+	SQL
+}
 
+create_indices_table ()
+{
+	psql $database_url <<-SQL
 		CREATE TABLE IF NOT EXISTS indices (
 			symbol TEXT NOT NULL,
 			datetime TIMESTAMP NOT NULL,
@@ -38,9 +50,6 @@ create_tables ()
 			low NUMERIC NOT NULL,
 			close NUMERIC NOT NULL
 		);
-
-		SELECT create_hypertable('stocks', 'datetime');
-		SELECT create_hypertable('etfs', 'datetime');
 		SELECT create_hypertable('indices', 'datetime');
 	SQL
 }
@@ -66,6 +75,7 @@ create_etfs_rth_view ()
 				AND EXTRACT(EPOCH FROM datetime::time) <= 57600;
 
 	SQL
+}
 
 create_assets_rth_view ()
 {
@@ -156,7 +166,9 @@ if [[ -z $database_url || -n $2 ]]; then
 fi
 
 enable_timescale
-create_tables
+create_stocks_table
+create_etfs_table
+create_indices_table
 create_stocks_rth_view
 create_etfs_rth_view
 create_assets_rth_view
