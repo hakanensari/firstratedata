@@ -154,6 +154,49 @@ create_assets_rth_1d_view ()
 	SQL
 }
 
+create_indicators_view ()
+{
+	psql $database_url <<-SQL
+		CREATE OR REPLACE VIEW indicators AS
+			WITH true_ranges AS (
+				SELECT today.symbol,
+					today.datetime,
+					GREATEST(today.high - today.low, ABS(today.high - yesterday.close), ABS(today.low - yesterday.close)) AS tr
+				FROM stocks_rth_1d today,
+				LATERAL (
+						SELECT close
+						FROM assets_rth_1d
+						WHERE datetime < today.datetime
+						AND symbol = today.symbol
+						ORDER by datetime DESC
+						LIMIT 1
+				) yesterday
+			)
+			SELECT symbol,
+				datetime,
+				close,
+				volume,
+				(
+					SELECT CASE WHEN count(*) = 14 THEN sum(tr) / 14 ELSE null END
+					FROM (
+						SELECT tr
+						FROM true_ranges
+						WHERE symbol = assets_rth_1d.symbol
+						AND datetime <= assets_rth_1d.datetime
+						ORDER BY datetime DESC
+						LIMIT 14
+					) AS true_ranges_to_average
+				) AS atr,
+				NULL AS satr,
+				NULL AS mav55,
+				NULL AS mav233,
+				NULL AS dayoftheweek,
+				NULL AS predayhi,
+				NULL AS predaylow
+			FROM assets_rth_1d;
+	SQL
+}
+
 usage ()
 {
 	echo "usage: setup [database]"
@@ -176,3 +219,4 @@ create_indices_1d_view
 create_stocks_rth_1d_view
 create_etfs_rth_1d_view
 create_assets_rth_1d_view
+create_indicators_view
