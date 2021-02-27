@@ -175,25 +175,48 @@ create_indicators_view ()
 			SELECT symbol,
 				datetime,
 				close,
-				volume,
 				(
-					SELECT CASE WHEN count(*) = 14 THEN sum(tr) / 14 ELSE null END
+					SELECT CASE WHEN count(*) = 10 THEN ROUND(SUM(volume) / 10) ELSE null END
+					FROM (
+						SELECT volume
+						FROM assets_rth_1d
+						WHERE symbol = a.symbol
+						AND datetime <= a.datetime
+						ORDER BY datetime DESC
+						LIMIT 10
+					) AS volumes_to_average
+				) AS volume10,
+				(
+					SELECT CASE WHEN count(*) = 14 THEN ROUND(SUM(tr) / 14, 3) ELSE null END
 					FROM (
 						SELECT tr
 						FROM true_ranges
-						WHERE symbol = assets_rth_1d.symbol
-						AND datetime <= assets_rth_1d.datetime
+						WHERE symbol = a.symbol
+						AND datetime <= a.datetime
 						ORDER BY datetime DESC
 						LIMIT 14
 					) AS true_ranges_to_average
 				) AS atr,
-				NULL AS satr,
 				NULL AS mav55,
 				NULL AS mav233,
 				NULL AS dayoftheweek,
-				NULL AS predayhi,
-				NULL AS predaylow
-			FROM assets_rth_1d;
+				(
+					SELECT high
+					FROM assets_rth_1d
+					WHERE symbol = a.symbol
+					AND datetime <= a.datetime
+					ORDER BY datetime DESC
+					LIMIT 1
+				) AS predayhi,
+				(
+					SELECT low
+					FROM assets_rth_1d
+					WHERE symbol = a.symbol
+					AND datetime <= a.datetime
+					ORDER BY datetime DESC
+					LIMIT 1
+				) AS predaylow
+			FROM assets_rth_1d AS a;
 	SQL
 }
 
