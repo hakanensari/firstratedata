@@ -22,9 +22,6 @@ import_datasets ()
 			table=etfs
 		elif [[ $collection =~ usindex ]]; then
 			table=indices
-		elif [[ $collection =~ futures || $collection =~ contracts ]]; then
-			# TODO: Skip futures for now
-			continue
 		else
 			echo cannot parse $collection
 			exit 1
