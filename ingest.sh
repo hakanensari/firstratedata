@@ -8,8 +8,8 @@ truncate_tables ()
 drop_indices ()
 {
 	for table in stocks etfs indices; do
-		psql -c "DROP INDEX IF EXISTS ${table}_symbol_datetime_idx" $database_url
 		psql -c "DROP INDEX IF EXISTS ${table}_datetime_idx" $database_url
+		psql -c "DROP INDEX IF EXISTS ${table}_symbol_datetime_idx" $database_url
 	done
 }
 
@@ -44,13 +44,21 @@ import_datasets ()
 	done < <(find . -name "*.zip")
 }
 
-add_indices ()
+reindex ()
 {
 	for table in stocks etfs indices; do
-		psql -c "CREATE INDEX ${table}_symbol_datetime_idx ON $table (symbol, datetime)" $database_url
 		psql -c "CREATE INDEX ${table}_datetime_idx ON $table (datetime DESC)" $database_url
+		psql -c "CREATE INDEX ${table}_symbol_datetime_idx ON $table (symbol, datetime DESC)" $database_url
 	done
 	psql -c "ANALYZE" $database_url
+}
+
+compress_tables ()
+{
+	for table in stocks etfs indices; do
+		psql -c "ALTER TABLE $table set(timescaledb.compress, timescaledb.compress_segmentby = 'symbol')" $database_url
+		psql -c "SELECT add_compression_policy('$table', INTERVAL '7d')" $database_url
+	done
 }
 
 refresh_materialized_views ()
@@ -74,5 +82,6 @@ fi
 truncate_tables
 drop_indices
 import_datasets
-add_indices
+reindex
+compress_tables
 refresh_materialized_views
