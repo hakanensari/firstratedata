@@ -1,27 +1,23 @@
 #!/bin/bash
 
-truncate_tables ()
+drop_indexes ()
 {
-	psql -c "TRUNCATE TABLE stocks, etfs, indices" $database_url
-}
-
-drop_indices ()
-{
-	for table in stocks etfs indices; do
-		psql -c "DROP INDEX IF EXISTS ${table}_datetime_idx" $database_url
-		psql -c "DROP INDEX IF EXISTS ${table}_symbol_datetime_idx" $database_url
+	for table in stocks_1m etfs_1m indexes_1m; do
+		psql -c "DROP INDEX ${table}_datetime_idx" $database_url
+		psql -c "DROP INDEX ${table}_symbol_datetime_idx" $database_url
 	done
 }
 
 import_datasets ()
 {
+	cd data
 	while read collection; do
 		if [[ $collection =~ us1500 ]]; then
-			table=stocks
+			table=stocks_1m
 		elif [[ $collection =~ etf ]]; then
-			table=etfs
+			table=etfs_1m
 		elif [[ $collection =~ usindex ]]; then
-			table=indices
+			table=indexes_1m
 		else
 			echo cannot parse $collection
 			exit 1
@@ -44,18 +40,22 @@ import_datasets ()
 	done < <(find . -name "*.zip")
 }
 
-reindex ()
+create_indexes ()
 {
-	for table in stocks etfs indices; do
+	for table in stocks_1m etfs_1m indexes_1m; do
 		psql -c "CREATE INDEX ${table}_datetime_idx ON $table (datetime DESC)" $database_url
 		psql -c "CREATE INDEX ${table}_symbol_datetime_idx ON $table (symbol, datetime DESC)" $database_url
 	done
+}
+
+analyze ()
+{
 	psql -c "ANALYZE" $database_url
 }
 
 compress_tables ()
 {
-	for table in stocks etfs indices; do
+	for table in stocks_1m etfs_1m indexes_1m; do
 		psql -c "ALTER TABLE $table set(timescaledb.compress, timescaledb.compress_segmentby = 'symbol')" $database_url
 		psql -c "SELECT add_compression_policy('$table', INTERVAL '7d')" $database_url
 	done
@@ -63,9 +63,9 @@ compress_tables ()
 
 refresh_materialized_views ()
 {
-	psql -c "REFRESH MATERIALIZED VIEW indices_1d" $database_url
-	psql -c "REFRESH MATERIALIZED VIEW stocks_rth_1d" $database_url
-	psql -c "REFRESH MATERIALIZED VIEW etfs_rth_1d" $database_url
+	for view in stocks_rth_5m etfs_rth_5m indexes_5m stocks_rth_1h etfs_rth_1h indexes_1h stocks_rth_1d etfs_rth_1d indexes_1d; do
+		psql -c "CALL refresh_continuous_aggregate('$view', NULL, NULL)" $database_url
+	done
 }
 
 usage ()
@@ -79,9 +79,9 @@ if [[ -z $database_url || -n $2 ]]; then
 	exit 1
 fi
 
-truncate_tables
-drop_indices
+drop_indexes
 import_datasets
-reindex
+create_indexes
+analyze
 compress_tables
 refresh_materialized_views

@@ -2,6 +2,8 @@
 
 download_files ()
 {
+	mkdir -p data
+	cd data
 	while read url; do
 		file_url=$(curl -sI https://firstratedata.com/$url | grep -oE 'https://.*zip')
 		# Skip files we're not interested in
