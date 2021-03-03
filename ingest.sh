@@ -48,11 +48,6 @@ create_indexes ()
 	done
 }
 
-analyze ()
-{
-	psql -c "ANALYZE" $database_url
-}
-
 compress_chunks ()
 {
 	for table in stocks_1m etfs_1m indexes_1m; do
@@ -90,6 +85,5 @@ fi
 drop_indexes
 import_datasets
 create_indexes
-analyze
 compress_chunks
 refresh_caggs
