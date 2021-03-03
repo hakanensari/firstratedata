@@ -1,18 +1,20 @@
-CREATE OR REPLACE VIEW stocks_rth_1m AS
+CREATE OR REPLACE VIEW stocks_1m_rth AS
   SELECT *
   FROM stocks_1m
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
-    AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600;
+    AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
+    AND datetime >= '2015-01-01'::DATE;
 
-CREATE OR REPLACE VIEW etfs_rth_1m AS
+CREATE OR REPLACE VIEW etfs_1m_rth AS
   SELECT *
   FROM etfs_1m
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
-    AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600;
+    AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
+    AND datetime >= '2015-01-01'::DATE;
 
-DROP MATERIALIZED VIEW IF EXISTS stocks_rth_5m CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS stocks_5m_rth CASCADE;
 
-CREATE MATERIALIZED VIEW stocks_rth_5m
+CREATE MATERIALIZED VIEW stocks_5m_rth
 WITH (
   timescaledb.continuous,
   timescaledb.materialized_only = true
@@ -28,12 +30,13 @@ WITH (
   FROM stocks_1m
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
+    AND datetime >= '2015-01-01'::DATE
   GROUP BY 1, 2
 WITH NO DATA;
 
-DROP MATERIALIZED VIEW IF EXISTS etfs_rth_5m CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS etfs_5m_rth CASCADE;
 
-CREATE MATERIALIZED VIEW etfs_rth_5m
+CREATE MATERIALIZED VIEW etfs_5m_rth
 WITH (
   timescaledb.continuous,
   timescaledb.materialized_only = true
@@ -49,6 +52,7 @@ WITH (
   FROM etfs_1m
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
+    AND datetime >= '2015-01-01'::DATE
   GROUP BY 1, 2
 WITH NO DATA;
 
@@ -67,12 +71,13 @@ WITH (
     min(low) AS low,
     last("close", datetime) AS "close"
   FROM indexes_1m
+  WHERE datetime >= '2015-01-01'::DATE
   GROUP BY 1, 2
 WITH NO DATA;
 
-DROP MATERIALIZED VIEW IF EXISTS stocks_rth_1h CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS stocks_1h_rth CASCADE;
 
-CREATE MATERIALIZED VIEW stocks_rth_1h
+CREATE MATERIALIZED VIEW stocks_1h_rth
 WITH (
   timescaledb.continuous,
   timescaledb.materialized_only = true
@@ -88,12 +93,13 @@ WITH (
   FROM stocks_1m
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
+    AND datetime >= '2015-01-01'::DATE
   GROUP BY 1, 2
 WITH NO DATA;
 
-DROP MATERIALIZED VIEW IF EXISTS etfs_rth_1h CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS etfs_1h_rth CASCADE;
 
-CREATE MATERIALIZED VIEW etfs_rth_1h
+CREATE MATERIALIZED VIEW etfs_1h_rth
 WITH (
   timescaledb.continuous,
   timescaledb.materialized_only = true
@@ -109,6 +115,7 @@ WITH (
   FROM etfs_1m
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
+    AND datetime >= '2015-01-01'::DATE
   GROUP BY 1, 2
 WITH NO DATA;
 
@@ -127,12 +134,13 @@ WITH (
     min(low) AS low,
     last("close", datetime) AS "close"
   FROM indexes_1m
+  WHERE datetime >= '2015-01-01'::DATE
   GROUP BY 1, 2
 WITH NO DATA;
 
-DROP MATERIALIZED VIEW IF EXISTS stocks_rth_1d CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS stocks_1d_rth CASCADE;
 
-CREATE MATERIALIZED VIEW stocks_rth_1d
+CREATE MATERIALIZED VIEW stocks_1d_rth
 WITH (
   timescaledb.continuous,
   timescaledb.materialized_only = true
@@ -148,12 +156,13 @@ WITH (
   FROM stocks_1m
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
+    AND datetime >= '2015-01-01'::DATE
   GROUP BY 1, 2
 WITH NO DATA;
 
-DROP MATERIALIZED VIEW IF EXISTS etfs_rth_1d CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS etfs_1d_rth CASCADE;
 
-CREATE MATERIALIZED VIEW etfs_rth_1d
+CREATE MATERIALIZED VIEW etfs_1d_rth
 WITH (
   timescaledb.continuous,
   timescaledb.materialized_only = true
@@ -169,6 +178,7 @@ WITH (
   FROM etfs_1m
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
+    AND datetime >= '2015-01-01'::DATE
   GROUP BY 1, 2
 WITH NO DATA;
 
@@ -187,6 +197,7 @@ WITH (
     min(low) AS low,
     last("close", datetime) AS "close"
   FROM indexes_1m
+  WHERE datetime >= '2015-01-01'::DATE
   GROUP BY 1, 2
 WITH NO DATA;
 
@@ -197,30 +208,30 @@ CREATE OR REPLACE VIEW assets_1m AS
   SELECT *
   FROM etfs_1m;
 
-CREATE OR REPLACE VIEW assets_rth_1m AS
+CREATE OR REPLACE VIEW assets_1m_rth AS
   SELECT *
-  FROM stocks_rth_1m
+  FROM stocks_1m_rth
   UNION ALL
   SELECT *
-  FROM etfs_rth_1m;
+  FROM etfs_1m_rth;
 
-CREATE OR REPLACE VIEW assets_rth_5m AS
+CREATE OR REPLACE VIEW assets_5m_rth AS
   SELECT *
-  FROM stocks_rth_5m
+  FROM stocks_5m_rth
   UNION ALL
   SELECT *
-  FROM etfs_rth_5m;
+  FROM etfs_5m_rth;
 
-CREATE OR REPLACE VIEW assets_rth_1h AS
+CREATE OR REPLACE VIEW assets_1h_rth AS
   SELECT *
-  FROM stocks_rth_1h
+  FROM stocks_1h_rth
   UNION ALL
   SELECT *
-  FROM etfs_rth_1h;
+  FROM etfs_1h_rth;
 
-CREATE OR REPLACE VIEW assets_rth_1d AS
+CREATE OR REPLACE VIEW assets_1d_rth AS
   SELECT *
-  FROM stocks_rth_1d
+  FROM stocks_1d_rth
   UNION ALL
   SELECT *
-  FROM etfs_rth_1d;
+  FROM etfs_1d_rth;
