@@ -14,7 +14,7 @@ services:
       - "-c"
       - "shared_preload_libraries=timescaledb"
       - "-c"
-      - "shared_buffers=16027MB"
+      - "shared_buffers=32GB"
       - "-c"
       - "effective_cache_size=48081MB"
       - "-c"
