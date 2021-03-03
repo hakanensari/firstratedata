@@ -13,7 +13,10 @@ CREATE OR REPLACE VIEW etfs_rth_1m AS
 DROP MATERIALIZED VIEW IF EXISTS stocks_rth_5m CASCADE;
 
 CREATE MATERIALIZED VIEW stocks_rth_5m
-WITH (timescaledb.continuous) AS
+WITH (
+  timescaledb.continuous,
+  timescaledb.materialized_only = true
+) AS
   SELECT
     symbol,
     time_bucket('5m', datetime) AS datetime,
@@ -30,7 +33,10 @@ WITH (timescaledb.continuous) AS
 DROP MATERIALIZED VIEW IF EXISTS etfs_rth_5m CASCADE;
 
 CREATE MATERIALIZED VIEW etfs_rth_5m
-WITH (timescaledb.continuous) AS
+WITH (
+  timescaledb.continuous,
+  timescaledb.materialized_only = true
+) AS
   SELECT
     symbol,
     time_bucket('5m', datetime) AS datetime,
@@ -47,7 +53,10 @@ WITH (timescaledb.continuous) AS
 DROP MATERIALIZED VIEW IF EXISTS indexes_5m CASCADE;
 
 CREATE MATERIALIZED VIEW indexes_5m
-WITH (timescaledb.continuous) AS
+WITH (
+  timescaledb.continuous,
+  timescaledb.materialized_only = true
+) AS
   SELECT
     symbol,
     time_bucket('1d', datetime) AS datetime,
@@ -61,7 +70,10 @@ WITH (timescaledb.continuous) AS
 DROP MATERIALIZED VIEW IF EXISTS stocks_rth_1h CASCADE;
 
 CREATE MATERIALIZED VIEW stocks_rth_1h
-WITH (timescaledb.continuous) AS
+WITH (
+  timescaledb.continuous,
+  timescaledb.materialized_only = true
+) AS
   SELECT
     symbol,
     time_bucket('1h', datetime) AS datetime,
@@ -78,7 +90,10 @@ WITH (timescaledb.continuous) AS
 DROP MATERIALIZED VIEW IF EXISTS etfs_rth_1h CASCADE;
 
 CREATE MATERIALIZED VIEW etfs_rth_1h
-WITH (timescaledb.continuous) AS
+WITH (
+  timescaledb.continuous,
+  timescaledb.materialized_only = true
+) AS
   SELECT
     symbol,
     time_bucket('1h', datetime) AS datetime,
@@ -95,7 +110,10 @@ WITH (timescaledb.continuous) AS
 DROP MATERIALIZED VIEW IF EXISTS indexes_1h CASCADE;
 
 CREATE MATERIALIZED VIEW indexes_1h
-WITH (timescaledb.continuous) AS
+WITH (
+  timescaledb.continuous,
+  timescaledb.materialized_only = true
+) AS
   SELECT
     symbol,
     time_bucket('1d', datetime) AS datetime,
@@ -109,7 +127,10 @@ WITH (timescaledb.continuous) AS
 DROP MATERIALIZED VIEW IF EXISTS stocks_rth_1d CASCADE;
 
 CREATE MATERIALIZED VIEW stocks_rth_1d
-WITH (timescaledb.continuous) AS
+WITH (
+  timescaledb.continuous,
+  timescaledb.materialized_only = true
+) AS
   SELECT
     symbol,
     time_bucket('1d', datetime) AS datetime,
@@ -126,7 +147,10 @@ WITH (timescaledb.continuous) AS
 DROP MATERIALIZED VIEW IF EXISTS etfs_rth_1d CASCADE;
 
 CREATE MATERIALIZED VIEW etfs_rth_1d
-WITH (timescaledb.continuous) AS
+WITH (
+  timescaledb.continuous,
+  timescaledb.materialized_only = true
+) AS
   SELECT
     symbol,
     time_bucket('1d', datetime) AS datetime,
@@ -143,7 +167,10 @@ WITH (timescaledb.continuous) AS
 DROP MATERIALIZED VIEW IF EXISTS indexes_1d CASCADE;
 
 CREATE MATERIALIZED VIEW indexes_1d
-WITH (timescaledb.continuous) AS
+WITH (
+  timescaledb.continuous,
+  timescaledb.materialized_only = true
+) AS
   SELECT
     symbol,
     time_bucket('1d', datetime) AS datetime,
