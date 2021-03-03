@@ -28,7 +28,8 @@ WITH (
   FROM stocks_1m
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
-  GROUP BY 1, 2;
+  GROUP BY 1, 2
+WITH NO DATA;
 
 DROP MATERIALIZED VIEW IF EXISTS etfs_rth_5m CASCADE;
 
@@ -48,7 +49,8 @@ WITH (
   FROM etfs_1m
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
-  GROUP BY 1, 2;
+  GROUP BY 1, 2
+WITH NO DATA;
 
 DROP MATERIALIZED VIEW IF EXISTS indexes_5m CASCADE;
 
@@ -65,7 +67,8 @@ WITH (
     min(low) AS low,
     last("close", datetime) AS "close"
   FROM indexes_1m
-  GROUP BY 1, 2;
+  GROUP BY 1, 2
+WITH NO DATA;
 
 DROP MATERIALIZED VIEW IF EXISTS stocks_rth_1h CASCADE;
 
@@ -85,7 +88,8 @@ WITH (
   FROM stocks_1m
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
-  GROUP BY 1, 2;
+  GROUP BY 1, 2
+WITH NO DATA;
 
 DROP MATERIALIZED VIEW IF EXISTS etfs_rth_1h CASCADE;
 
@@ -105,7 +109,8 @@ WITH (
   FROM etfs_1m
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
-  GROUP BY 1, 2;
+  GROUP BY 1, 2
+WITH NO DATA;
 
 DROP MATERIALIZED VIEW IF EXISTS indexes_1h CASCADE;
 
@@ -122,7 +127,8 @@ WITH (
     min(low) AS low,
     last("close", datetime) AS "close"
   FROM indexes_1m
-  GROUP BY 1, 2;
+  GROUP BY 1, 2
+WITH NO DATA;
 
 DROP MATERIALIZED VIEW IF EXISTS stocks_rth_1d CASCADE;
 
@@ -142,7 +148,8 @@ WITH (
   FROM stocks_1m
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
-  GROUP BY 1, 2;
+  GROUP BY 1, 2
+WITH NO DATA;
 
 DROP MATERIALIZED VIEW IF EXISTS etfs_rth_1d CASCADE;
 
@@ -162,7 +169,8 @@ WITH (
   FROM etfs_1m
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
-  GROUP BY 1, 2;
+  GROUP BY 1, 2
+WITH NO DATA;
 
 DROP MATERIALIZED VIEW IF EXISTS indexes_1d CASCADE;
 
@@ -179,7 +187,8 @@ WITH (
     min(low) AS low,
     last("close", datetime) AS "close"
   FROM indexes_1m
-  GROUP BY 1, 2;
+  GROUP BY 1, 2
+WITH NO DATA;
 
 CREATE OR REPLACE VIEW assets_1m AS
   SELECT *
