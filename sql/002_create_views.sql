@@ -10,7 +10,7 @@ CREATE OR REPLACE VIEW etfs_rth_1m AS
   WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600;
 
-DROP MATERIALIZED VIEW stocks_rth_5m CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS stocks_rth_5m CASCADE;
 
 CREATE MATERIALIZED VIEW stocks_rth_5m
 WITH (timescaledb.continuous) AS
@@ -27,7 +27,7 @@ WITH (timescaledb.continuous) AS
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
   GROUP BY 1, 2;
 
-DROP MATERIALIZED VIEW etfs_rth_5m CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS etfs_rth_5m CASCADE;
 
 CREATE MATERIALIZED VIEW etfs_rth_5m
 WITH (timescaledb.continuous) AS
@@ -44,7 +44,7 @@ WITH (timescaledb.continuous) AS
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
   GROUP BY 1, 2;
 
-DROP MATERIALIZED VIEW indexes_5m CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS indexes_5m CASCADE;
 
 CREATE MATERIALIZED VIEW indexes_5m
 WITH (timescaledb.continuous) AS
@@ -58,7 +58,7 @@ WITH (timescaledb.continuous) AS
   FROM indexes_1m
   GROUP BY 1, 2;
 
-DROP MATERIALIZED VIEW stocks_rth_1h CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS stocks_rth_1h CASCADE;
 
 CREATE MATERIALIZED VIEW stocks_rth_1h
 WITH (timescaledb.continuous) AS
@@ -75,7 +75,7 @@ WITH (timescaledb.continuous) AS
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
   GROUP BY 1, 2;
 
-DROP MATERIALIZED VIEW etfs_rth_1h CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS etfs_rth_1h CASCADE;
 
 CREATE MATERIALIZED VIEW etfs_rth_1h
 WITH (timescaledb.continuous) AS
@@ -92,7 +92,7 @@ WITH (timescaledb.continuous) AS
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
   GROUP BY 1, 2;
 
-DROP MATERIALIZED VIEW indexes_1h CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS indexes_1h CASCADE;
 
 CREATE MATERIALIZED VIEW indexes_1h
 WITH (timescaledb.continuous) AS
@@ -106,7 +106,7 @@ WITH (timescaledb.continuous) AS
   FROM indexes_1m
   GROUP BY 1, 2;
 
-DROP MATERIALIZED VIEW stocks_rth_1d CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS stocks_rth_1d CASCADE;
 
 CREATE MATERIALIZED VIEW stocks_rth_1d
 WITH (timescaledb.continuous) AS
@@ -123,7 +123,7 @@ WITH (timescaledb.continuous) AS
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
   GROUP BY 1, 2;
 
-DROP MATERIALIZED VIEW etfs_rth_1d CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS etfs_rth_1d CASCADE;
 
 CREATE MATERIALIZED VIEW etfs_rth_1d
 WITH (timescaledb.continuous) AS
@@ -140,7 +140,7 @@ WITH (timescaledb.continuous) AS
     AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
   GROUP BY 1, 2;
 
-DROP MATERIALIZED VIEW indexes_1d CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS indexes_1d CASCADE;
 
 CREATE MATERIALIZED VIEW indexes_1d
 WITH (timescaledb.continuous) AS
