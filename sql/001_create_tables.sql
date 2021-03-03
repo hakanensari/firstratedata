@@ -47,10 +47,31 @@ SELECT create_hypertable('stocks_1m', 'datetime');
 
 SELECT add_reorder_policy('stocks_1m', 'stocks_1m_symbol_datetime_idx');
 
+ALTER TABLE stocks_1m SET(
+  timescaledb.compress,
+  timescaledb.compress_segmentby = 'symbol'
+);
+
+SELECT add_compression_policy(stocks_1m, interval '7d');
+
 SELECT create_hypertable('etfs_1m', 'datetime');
+
+ALTER TABLE etfs_1m SET(
+  timescaledb.compress,
+  timescaledb.compress_segmentby = 'symbol'
+);
+
+SELECT add_compression_policy(etfs_1m, interval '7d');
 
 SELECT add_reorder_policy('etfs_1m', 'etfs_1m_symbol_datetime_idx');
 
 SELECT create_hypertable('indexes_1m', 'datetime');
 
 SELECT add_reorder_policy('indexes_1m', 'indexes_1m_symbol_datetime_idx');
+
+ALTER TABLE indexes_1m SET(
+  timescaledb.compress,
+  timescaledb.compress_segmentby = 'symbol'
+);
+
+SELECT add_compression_policy(indexes_1m, interval '7d');

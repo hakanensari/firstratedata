@@ -53,11 +53,21 @@ analyze ()
 	psql -c "ANALYZE" $database_url
 }
 
-compress_tables ()
+compress_chunks ()
 {
 	for table in stocks_1m etfs_1m indexes_1m; do
-		psql -c "ALTER TABLE $table set(timescaledb.compress, timescaledb.compress_segmentby = 'symbol')" $database_url
-		psql -c "SELECT add_compression_policy('$table', INTERVAL '7d')" $database_url
+		psql $database_url <<-SQL
+			SELECT
+				compress_chunk(chunk)
+			FROM (
+				SELECT concat(chunk_schema, '.', chunk_name)::regclass AS chunk
+				FROM chunk_compression_stats('$table')
+				WHERE compression_status != 'Compressed'
+				INTERSECT
+				SELECT
+					show_chunks('$table', older_than => interval '1 week')
+			) AS chunk
+		SQL
 	done
 }
 
@@ -83,5 +93,5 @@ drop_indexes
 import_datasets
 create_indexes
 analyze
-compress_tables
+compress_chunks
 refresh_materialized_views
