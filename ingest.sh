@@ -71,11 +71,9 @@ compress_chunks ()
 	done
 }
 
-refresh_materialized_views ()
+refresh_caggs ()
 {
-	for view in stocks_rth_5m etfs_rth_5m indexes_5m stocks_rth_1h etfs_rth_1h indexes_1h stocks_rth_1d etfs_rth_1d indexes_1d; do
-		psql -c "CALL refresh_continuous_aggregate('$view', NULL, NULL)" $database_url
-	done
+	./refresh_caggs.sh $database_url
 }
 
 usage ()
@@ -94,4 +92,4 @@ import_datasets
 create_indexes
 analyze
 compress_chunks
-refresh_materialized_views
+refresh_caggs
