@@ -1,43 +1,63 @@
-WITH filtered_dataset AS (
+WITH dataset AS (
 	SELECT *
 	FROM assets_1m_rth
-	WHERE symbol = any(regexp_split_to_array(upper({{ symbols }}), ',\s*'))
-	AND datetime >= {{date}}
-	AND datetime < {{date}} + interval '1 day'
-), ticks AS (
+	WHERE {{symbol}}
+	AND datetime >= {{datetime}}
+	AND datetime < {{datetime}} + interval '1 day'
+), synthetic_dataset AS (
 	SELECT
 		EXTRACT(EPOCH FROM datetime::TIME) AS printtime,
 		symbol AS "name",
 		open AS "last",
-		(volume / 4)::INT AS print_size
-	FROM filtered_dataset
+		(volume / 6)::INT AS print_size
+	FROM dataset
 	UNION ALL
 	SELECT
-		EXTRACT(EPOCH FROM datetime::TIME) + 15 AS printtime,
+		EXTRACT(EPOCH FROM datetime::TIME) + 10 AS printtime,
+		symbol AS "name",
+		CASE
+			WHEN open > "close" THEN least(high, lag(high) OVER (PARTITION BY symbol ORDER BY datetime))
+			ELSE greatest(low, lag(low) OVER (PARTITION BY symbol ORDER BY datetime))
+		END AS "last",
+		(volume / 6)::INT AS print_size
+	FROM dataset
+	UNION ALL
+	SELECT
+		EXTRACT(EPOCH FROM datetime::TIME) + 20 AS printtime,
 		symbol AS "name",
 		CASE
 			WHEN open > "close" THEN high
 			ELSE low
 		END AS "last",
-		(volume / 4)::INT AS print_size
-	FROM filtered_dataset
+		(volume / 6)::INT AS print_size
+	FROM dataset
 	UNION ALL
 	SELECT
 		EXTRACT(EPOCH FROM datetime::TIME) + 30 AS printtime,
 		symbol AS "name",
 		CASE
+			WHEN open > "close" THEN greatest(low, lag(low) OVER (PARTITION BY symbol ORDER BY datetime))
+			ELSE least(high, lag(high) OVER (PARTITION BY symbol ORDER BY datetime))
+		END AS "last",
+		(volume / 6)::INT AS print_size
+	FROM dataset
+	UNION ALL
+	SELECT
+		EXTRACT(EPOCH FROM datetime::TIME) + 40 AS printtime,
+		symbol AS "name",
+		CASE
 			WHEN open > "close" THEN low
 			ELSE high
 		END AS "last",
-		(volume / 4)::INT AS print_size
-	FROM filtered_dataset
+		(volume / 6)::INT AS print_size
+	FROM dataset
 	UNION ALL
 	SELECT
-		EXTRACT(EPOCH FROM datetime::TIME) + 45 AS printtime,
+		EXTRACT(EPOCH FROM datetime::TIME) + 50 AS printtime,
 		symbol AS "name",
 		"close" AS "last",
-		(volume / 4)::INT AS print_size
-	FROM filtered_dataset
+		(volume / 6)::INT AS print_size
+	FROM dataset
 )
 SELECT
 	printtime,
@@ -50,7 +70,7 @@ SELECT
 	print_size,
 	(
 		SELECT open
-		FROM filtered_dataset t1
+		FROM dataset t1
 		WHERE symbol = "name"
 		ORDER BY datetime
 		LIMIT 1
@@ -61,5 +81,5 @@ SELECT
 	0 AS pclose,
 	' ' AS sale_conditions,
 	0 AS print_filter
-FROM ticks
+FROM synthetic_dataset
 ORDER BY printtime, "name";
