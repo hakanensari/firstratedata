@@ -14,13 +14,7 @@ SELECT
 	open AS "last",
 	0 AS size,
 	volume AS print_size,
-	(
-		SELECT open
-		FROM dataset t1
-		WHERE symbol = dataset.symbol
-		ORDER BY datetime
-		LIMIT 1
-	) AS xopen,
+	first_value(last) OVER (PARTITION BY "name" ORDER BY printtime) AS xopen,
 	0 AS avgprice,
 	0 AS bid,
 	0 AS ask,
