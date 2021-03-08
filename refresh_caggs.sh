@@ -7,11 +7,6 @@ refresh_caggs ()
 	done
 }
 
-regrant_privileges_to_metabase_user ()
-{
-	psql -c "GRANT SELECT ON ALL TABLES IN SCHEMA public TO metabase_ro" $database_url
-}
-
 usage ()
 {
 	echo "usage: refress_caggs [database_url]"
@@ -24,4 +19,3 @@ if [[ -z $database_url || -n $2 ]]; then
 fi
 
 refresh_caggs
-regrant_privileges_to_metabase_user

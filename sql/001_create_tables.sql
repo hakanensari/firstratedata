@@ -1,5 +1,17 @@
 CREATE EXTENSION IF NOT EXISTS timescaledb;
 
+DROP MATERIALIZED VIEW IF EXISTS stocks_5m_rth CASCADE;
+
+DROP MATERIALIZED VIEW IF EXISTS etfs_5m_rth CASCADE;
+
+DROP MATERIALIZED VIEW IF EXISTS indexes_5m CASCADE;
+
+DROP MATERIALIZED VIEW IF EXISTS stocks_1d_rth CASCADE;
+
+DROP MATERIALIZED VIEW IF EXISTS etfs_1d_rth CASCADE;
+
+DROP MATERIALIZED VIEW IF EXISTS indexes_1d CASCADE;
+
 DROP TABLE IF EXISTS stocks_1m CASCADE;
 
 DROP TABLE IF EXISTS etfs_1m CASCADE;
@@ -52,7 +64,7 @@ ALTER TABLE stocks_1m SET(
 	timescaledb.compress_segmentby = 'symbol'
 );
 
-SELECT add_compression_policy(stocks_1m, interval '7d');
+SELECT add_compression_policy('stocks_1m', interval '7d');
 
 SELECT create_hypertable('etfs_1m', 'datetime');
 
@@ -61,7 +73,7 @@ ALTER TABLE etfs_1m SET(
 	timescaledb.compress_segmentby = 'symbol'
 );
 
-SELECT add_compression_policy(etfs_1m, interval '7d');
+SELECT add_compression_policy('etfs_1m', interval '7d');
 
 SELECT add_reorder_policy('etfs_1m', 'etfs_1m_symbol_datetime_idx');
 
@@ -74,4 +86,4 @@ ALTER TABLE indexes_1m SET(
 	timescaledb.compress_segmentby = 'symbol'
 );
 
-SELECT add_compression_policy(indexes_1m, interval '7d');
+SELECT add_compression_policy('indexes_1m', interval '7d');
