@@ -1,9 +1,9 @@
-WITH filtered_dataset AS (
+WITH dataset AS (
 	SELECT *
 	FROM assets_1m_rth
-	WHERE symbol = any(regexp_split_to_array(upper({{ symbols }}), ',\s*'))
-	AND datetime >= {{date}}
-	AND datetime < {{date}} + interval '1 day'
+	WHERE {{symbol}}
+	AND datetime >= {{datetime}}
+	AND datetime < {{datetime}} + interval '1 day'
 )
 SELECT
 	EXTRACT(EPOCH FROM datetime::TIME) AS printtime,
@@ -16,8 +16,8 @@ SELECT
 	volume AS print_size,
 	(
 		SELECT open
-		FROM filtered_dataset t1
-		WHERE symbol = filtered_dataset.symbol
+		FROM dataset t1
+		WHERE symbol = dataset.symbol
 		ORDER BY datetime
 		LIMIT 1
 	) AS xopen,
@@ -27,5 +27,5 @@ SELECT
 	0 AS pclose,
 	' ' AS sale_conditions,
 	0 AS print_filter
-FROM filtered_dataset
+FROM dataset
 ORDER BY printtime, "name";
