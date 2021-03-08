@@ -9,9 +9,11 @@ download_files ()
 		# Skip files we're not interested in
 		if [[ $file_url =~ futures|contracts ]]; then
 			continue
-		elif [[ $file_url =~ 5min|30min|1hour|UNADJUSTED ]]; then
+		elif [[ $file_url =~ 5min|30min|1hour ]]; then
 			continue
 		elif [[ $file_url =~ 2021 ]]; then
+			continue
+		elif [[ ! $file_url =~ usindex|UNADJUSTED ]]; then
 			continue
 		fi
 		curl -sO $file_url &
