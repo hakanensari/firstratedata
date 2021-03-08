@@ -1,4 +1,4 @@
-WITH filtered_dataset AS (
+WITH dataset AS (
     SELECT *
     FROM assets_1d_rth
     WHERE {{symbol}}
@@ -10,13 +10,13 @@ WITH filtered_dataset AS (
 		datetime,
 		(
 			SELECT greatest(now.high - now.low, abs(now.high - previous."close"), abs(now.low - previous."close"))
-			FROM filtered_dataset AS previous
+			FROM dataset AS previous
 			WHERE datetime < now.datetime
 			AND symbol = now.symbol
 			ORDER BY datetime DESC
 			LIMIT 1
 		) AS tr
-	FROM filtered_dataset AS now
+	FROM dataset AS now
 )
 SELECT
 	symbol,
@@ -26,7 +26,7 @@ SELECT
 	    SELECT avg("close")
 	    FROM (
 	        SELECT *
-	        FROM filtered_dataset
+	        FROM dataset
 	        WHERE datetime <= fd.datetime
 	        AND symbol = fd.symbol
 	        ORDER BY datetime DESC
@@ -37,7 +37,7 @@ SELECT
 	    SELECT avg("close")
 	    FROM (
 	        SELECT *
-	        FROM filtered_dataset
+	        FROM dataset
 	        WHERE datetime <= fd.datetime
 	        AND symbol = fd.symbol
 	        ORDER BY datetime DESC
@@ -61,6 +61,6 @@ SELECT
 	        LIMIT 14
 	   ) AS ss
 	) AS atr
-FROM filtered_dataset AS fd
+FROM dataset AS fd
 WHERE datetime > {{start_date}}
 ORDER BY datetime, symbol;
