@@ -6,7 +6,6 @@ CREATE OR REPLACE FUNCTION atrader_mav(text, timestamp, integer) RETURNS numeric
     	FROM assets_5m_rth
     	WHERE symbol = $1
 		AND datetime < CAST($2 AS timestamp) + interval '1 day'
-		AND datetime > CAST($2 AS timestamp) - interval '1 week' -- speeds up the query
 		ORDER BY datetime DESC
 		LIMIT $3
 	)
