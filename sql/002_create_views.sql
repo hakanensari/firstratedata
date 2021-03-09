@@ -2,14 +2,14 @@ CREATE OR REPLACE VIEW stocks_1m_rth AS
 	SELECT *
 	FROM stocks_1m
 	WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
-	AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
+	AND EXTRACT(EPOCH FROM datetime::TIME) < 57600
 	AND datetime >= '2015-01-01'::DATE;
 
 CREATE OR REPLACE VIEW etfs_1m_rth AS
 	SELECT *
 	FROM etfs_1m
 	WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
-	AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
+	AND EXTRACT(EPOCH FROM datetime::TIME) < 57600
 	AND datetime >= '2015-01-01'::DATE;
 
 DROP MATERIALIZED VIEW IF EXISTS stocks_5m_rth CASCADE;
@@ -29,7 +29,7 @@ WITH (
 		sum(volume) AS volume
 	FROM stocks_1m
 	WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
-	AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
+	AND EXTRACT(EPOCH FROM datetime::TIME) < 57600
 	AND datetime >= '2015-01-01'::DATE
 	GROUP BY 1, 2
 WITH NO DATA;
@@ -51,7 +51,7 @@ WITH (
 		sum(volume) AS volume
 	FROM etfs_1m
 	WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
-	AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
+	AND EXTRACT(EPOCH FROM datetime::TIME) < 57600
 	AND datetime >= '2015-01-01'::DATE
 	GROUP BY 1, 2
 WITH NO DATA;
@@ -92,7 +92,7 @@ WITH (
 		sum(volume) AS volume
 	FROM stocks_1m
 	WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
-	AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
+	AND EXTRACT(EPOCH FROM datetime::TIME) < 57600
 	AND datetime >= '2015-01-01'::DATE
 	GROUP BY 1, 2
 WITH NO DATA;
@@ -114,7 +114,7 @@ WITH (
 		sum(volume) AS volume
 	FROM etfs_1m
 	WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
-	AND EXTRACT(EPOCH FROM datetime::TIME) <= 57600
+	AND EXTRACT(EPOCH FROM datetime::TIME) < 57600
 	AND datetime >= '2015-01-01'::DATE
 	GROUP BY 1, 2
 WITH NO DATA;
