@@ -65,7 +65,7 @@ WITH (
 ) AS
 	SELECT
 		symbol,
-		time_bucket('1d', datetime) AS datetime,
+		time_bucket('5m', datetime) AS datetime,
 		first(open, datetime) AS open,
 		max(high) AS high,
 		min(low) AS low,
