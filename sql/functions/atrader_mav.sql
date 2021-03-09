@@ -5,7 +5,7 @@ CREATE OR REPLACE FUNCTION atrader_mav(text, timestamp, integer) RETURNS numeric
     	SELECT "close"
     	FROM assets_5m_rth
     	WHERE symbol = $1
-		AND datetime < CAST($2 AS timestamp) + interval '1 day'
+		AND datetime <= $2
 		ORDER BY datetime DESC
 		LIMIT $3
 	)
