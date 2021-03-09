@@ -5,6 +5,7 @@ CREATE OR REPLACE FUNCTION atrader_tr(text, timestamp) RETURNS numeric AS $$
     	FROM assets_1d_rth
     	WHERE symbol = $1
 		AND datetime <= $2
+		AND datetime > CAST($2 AS timestamp) - interval '1 week'
 		ORDER BY datetime DESC
 		LIMIT 2
 	)
