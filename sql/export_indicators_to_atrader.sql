@@ -17,8 +17,8 @@ SELECT
 	atrader_vol(symbol, datetime) AS "${VOLUME}",
 	atrader_atr(symbol, datetime) AS "${ATR}",
 	atrader_tr(symbol, datetime) AS "${sATR}",
-	atrader_mav(symbol, datetime, 55) AS "${Mav55}",
-	atrader_mav(symbol, datetime, 233) AS "${Mav233}",
+	atrader_mav(symbol, datetime + interval '15 hours 55 minutes', 55) AS "${Mav55}",
+	atrader_mav(symbol, datetime + interval '15 hours 55 minutes', 233) AS "${Mav233}",
 	EXTRACT(DOW FROM {{datetime}}) AS "${Dayoftheweek}",
 	high AS "${preDayhi}",
 	low AS "${predaylow}"
