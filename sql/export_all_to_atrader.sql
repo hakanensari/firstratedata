@@ -160,7 +160,7 @@ WITH dataset AS (
 	FROM dataset
 )
 SELECT
-	printtime,
+	CAST(printtime AS int),
 	"name",
 	row_number() OVER (PARTITION BY "name" ORDER BY printtime) AS print_count,
 	'NSDQ' AS primary_exchange_name,
