@@ -16,6 +16,21 @@ services:
       LETSENCRYPT_HOST: grafana.atrader.lineofflig.ht
       VIRTUAL_HOST: grafana.atrader.lineofflig.ht
 
+  metabase:
+    image: metabase/metabase
+    expose:
+      - "3000"
+    volumes:
+      - metabase-data:/data
+    links:
+      - db
+    environment:
+      JAVA_TOOL_OPTIONS: -Xmx4g
+      LETSENCRYPT_EMAIL: hakanensari@gmail.com
+      LETSENCRYPT_HOST: metabase.atrader.lineofflig.ht
+      MB_DB_FILE: /data/metabase.db
+      VIRTUAL_HOST: metabase.atrader.lineofflig.ht
+
   db:
     image: timescale/timescaledb:latest-pg13
     ports:
@@ -64,16 +79,6 @@ services:
       - "autovacuum_max_workers=10"
       - "-c"
       - "autovacuum_naptime=10"
-
-  metabase:
-    image: metabase/metabase
-    expose:
-      - "3000"
-    volumes:
-      - metabase-data:/data
-    env_file: ./metabase.env
-    links:
-      - db
 
   nginx-proxy:
     image: jwilder/nginx-proxy
