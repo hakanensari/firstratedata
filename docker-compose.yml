@@ -1,6 +1,21 @@
 version: "3.8"
 
 services:
+  grafana:
+    image: grafana/grafana:latest
+    expose:
+      - "3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    links:
+      - db
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: TKy36eLZ!WL-.Biv@
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      LETSENCRYPT_EMAIL: hakanensari@gmail.com
+      LETSENCRYPT_HOST: grafana.atrader.lineofflig.ht
+      VIRTUAL_HOST: grafana.atrader.lineofflig.ht
+
   db:
     image: timescale/timescaledb:latest-pg13
     ports:
@@ -87,6 +102,7 @@ services:
 
 volumes:
   db-data:
+  grafana-data:
   metabase-data:
   certs:
   html:
