@@ -1,5 +1,5 @@
 -- Returns the average true range of specified symbol on specified day
-CREATE OR REPLACE FUNCTION atrader_atr(text, timestamp) RETURNS numeric AS $$
+CREATE OR REPLACE FUNCTION atrader_atr(text, timestamp, integer) RETURNS numeric AS $$
 	WITH dataset AS (
     	SELECT datetime
     	FROM assets_1d_rth
@@ -7,7 +7,7 @@ CREATE OR REPLACE FUNCTION atrader_atr(text, timestamp) RETURNS numeric AS $$
 		AND datetime <= $2
 		AND datetime > CAST($2 AS timestamp) - interval '4 weeks'
 		ORDER BY datetime DESC
-		LIMIT 14
+		LIMIT $3
 	)
 	SELECT round(avg(atrader_tr($1, datetime)), 4)
 	FROM dataset;

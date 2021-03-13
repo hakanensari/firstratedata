@@ -14,8 +14,8 @@ WITH previous_day AS (
 SELECT
 	symbol,
 	"close" AS "${CLOSE}",
-	atrader_vol(symbol, datetime) AS "${VOLUME}",
-	atrader_atr(symbol, datetime) AS "${ATR}",
+	atrader_vol(symbol, datetime, 10) AS "${VOLUME}",
+	atrader_atr(symbol, datetime, 14) AS "${ATR}",
 	atrader_tr(symbol, datetime) AS "${sATR}",
 	atrader_mav_5m(symbol, datetime + interval '16 hours', 55) AS "${Mav55}",
 	atrader_mav_5m(symbol, datetime + interval '16 hours', 233) AS "${Mav233}",
