@@ -12,7 +12,7 @@ import_datasets ()
 {
 	cd data
 	while read collection; do
-		if [[ $collection =~ us1500 ]]; then
+		if [[ $collection =~ us3000 ]]; then
 			table=stocks_1m
 		elif [[ $collection =~ etf ]]; then
 			table=etfs_1m
