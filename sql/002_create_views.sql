@@ -3,14 +3,14 @@ CREATE OR REPLACE VIEW stocks_1m_rth AS
 	FROM stocks_1m
 	WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
 	AND EXTRACT(EPOCH FROM datetime::TIME) < 57600
-	AND datetime >= '2015-01-01'::DATE;
+	AND datetime >= '2018-01-01'::DATE;
 
 CREATE OR REPLACE VIEW etfs_1m_rth AS
 	SELECT *
 	FROM etfs_1m
 	WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
 	AND EXTRACT(EPOCH FROM datetime::TIME) < 57600
-	AND datetime >= '2015-01-01'::DATE;
+	AND datetime >= '2018-01-01'::DATE;
 
 DROP MATERIALIZED VIEW IF EXISTS stocks_5m_rth CASCADE;
 
@@ -30,7 +30,7 @@ WITH (
 	FROM stocks_1m
 	WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
 	AND EXTRACT(EPOCH FROM datetime::TIME) < 57600
-	AND datetime >= '2015-01-01'::DATE
+	AND datetime >= '2018-01-01'::DATE
 	GROUP BY 1, 2
 WITH NO DATA;
 
@@ -52,7 +52,7 @@ WITH (
 	FROM etfs_1m
 	WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
 	AND EXTRACT(EPOCH FROM datetime::TIME) < 57600
-	AND datetime >= '2015-01-01'::DATE
+	AND datetime >= '2018-01-01'::DATE
 	GROUP BY 1, 2
 WITH NO DATA;
 
@@ -71,7 +71,7 @@ WITH (
 		min(low) AS low,
 		last("close", datetime) AS "close"
 	FROM indexes_1m
-	WHERE datetime >= '2015-01-01'::DATE
+	WHERE datetime >= '2018-01-01'::DATE
 	GROUP BY 1, 2
 WITH NO DATA;
 
@@ -93,7 +93,7 @@ WITH (
 	FROM stocks_1m
 	WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
 	AND EXTRACT(EPOCH FROM datetime::TIME) < 57600
-	AND datetime >= '2015-01-01'::DATE
+	AND datetime >= '2018-01-01'::DATE
 	GROUP BY 1, 2
 WITH NO DATA;
 
@@ -115,7 +115,7 @@ WITH (
 	FROM etfs_1m
 	WHERE EXTRACT(EPOCH FROM datetime::TIME) >= 34200
 	AND EXTRACT(EPOCH FROM datetime::TIME) < 57600
-	AND datetime >= '2015-01-01'::DATE
+	AND datetime >= '2018-01-01'::DATE
 	GROUP BY 1, 2
 WITH NO DATA;
 
@@ -134,7 +134,7 @@ WITH (
 		min(low) AS low,
 		last("close", datetime) AS "close"
 	FROM indexes_1m
-	WHERE datetime >= '2015-01-01'::DATE
+	WHERE datetime >= '2018-01-01'::DATE
 	GROUP BY 1, 2
 WITH NO DATA;
 
