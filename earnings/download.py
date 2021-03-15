@@ -28,7 +28,7 @@ while current_date <= to_date:
         errors = 0
         print(current_date)
     except KeyError as e:
-        if errors > 6:
+        if errors > 7:
             traceback.print_exc()
             break
 
