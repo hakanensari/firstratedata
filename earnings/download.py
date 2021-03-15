@@ -13,7 +13,7 @@ yec = YahooEarningsCalendar()
 cal = UnitedStates()
 
 from_date = datetime.date.fromisoformat(sys.argv[1])
-to_date = datetime.date.today()
+to_date = datetime.date.fromisoformat(sys.argv[2]) if len(sys.argv) == 3 else datetime.date.today()
 current_date = from_date
 delta = datetime.timedelta(days=1)
 earnings = []
