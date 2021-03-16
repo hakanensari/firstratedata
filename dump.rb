@@ -73,6 +73,12 @@ sql_template_for_indicators = File.read('sql/export_indicators_to_atrader.sql')
         .gsub('{{symbol}}', "symbol=any('{#{symbols.join(',')}}')")
         .gsub('{{datetime}}', "'#{date}'")
     data = pg.fetch(sql)
+
+    if data.empty?
+      puts "#{strategy}/#{date} has no data"
+      next
+    end
+
     CSV.open("backtest/#{strategy}/test_#{date.tr('-', '')}/indicators.csv", 'wb', write_headers: true, headers: data.first.keys) do |csv|
       data.each do |record|
         csv << record.values.map { |val| val.is_a?(BigDecimal) ? val.to_f : val }
