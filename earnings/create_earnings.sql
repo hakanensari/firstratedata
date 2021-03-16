@@ -2,12 +2,12 @@ DROP TABLE IF EXISTS earnings CASCADE;
 
 CREATE TABLE earnings (
 	ticker TEXT NOT NULL,
-	companyshortname TEXT NOT NULL,
+	companyshortname TEXT,
 	startdatetime TIMESTAMP NOT NULL,
 	startdatetimetype TEXT NOT NULL,
-	epsestimate DECIMAL NOT NULL,
-	epsactual DECIMAL NOT NULL,
-	epssurprisepct DECIMAL NOT NULL,
+	epsestimate DECIMAL,
+	epsactual DECIMAL,
+	epssurprisepct DECIMAL,
 	timeZoneShortName TEXT NOT NULL,
 	gmtOffsetMilliSeconds INTEGER NOT NULL,
 	quoteType TEXT NOT NULL
