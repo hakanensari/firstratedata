@@ -24,9 +24,9 @@ while current_date <= to_date:
         if cal.is_working_day(current_date):
             earnings += yec.earnings_on(current_date)
 
+        print(current_date)
         current_date += delta
         errors = 0
-        print(current_date)
     except KeyError as e:
         if errors > 7:
             traceback.print_exc()
