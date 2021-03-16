@@ -38,6 +38,7 @@ import_datasets ()
 			| timescaledb-parallel-copy -connection $database_url -workers 8 -table $table
 		done < <(unzip -Z1 $collection)
 	done < <(find . -name "*.zip")
+	cd ..
 }
 
 create_indexes ()
