@@ -3,7 +3,7 @@ WITH dataset AS (
 	FROM assets_1m_rth
 	WHERE {{symbol}}
 	AND datetime >= {{datetime}}
-	AND datetime < {{datetime}} + interval '1 day'
+	AND datetime < CAST({{datetime}} AS timestamp) + interval '1 day'
 )
 SELECT
 	EXTRACT(EPOCH FROM datetime::TIME) AS printtime,

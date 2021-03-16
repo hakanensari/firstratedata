@@ -20,7 +20,7 @@ SELECT
 	atrader_mav_5m(symbol, datetime + interval '16 hours', 55) AS "${Mav55}",
 	atrader_mav_5m(symbol, datetime + interval '16 hours', 233) AS "${Mav233}",
 	atrader_mav_1m(symbol, datetime + interval '16 hours', 55) AS "${Mav1m55}",
-	EXTRACT(DOW FROM {{datetime}}) AS "${Dayoftheweek}",
+	EXTRACT(DOW FROM CAST({{datetime}} AS timestamp)) AS "${Dayoftheweek}",
 	high AS "${preDayhi}",
 	low AS "${predaylow}"
 FROM dataset
