@@ -3,7 +3,8 @@
 import_datasets ()
 {
 	while read dataset; do
-		psql -c "COPY earnings FROM STDIN CSV HEADER" $database_url
+		cat $dataset \
+		| psql -c "COPY earnings FROM STDIN CSV HEADER" $database_url
 	done < <(find . -name "*.csv")
 }
 
