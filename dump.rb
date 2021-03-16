@@ -79,4 +79,31 @@ sql_template_for_indicators = File.read('sql/export_indicators_to_atrader.sql')
       end
     end
   end
+
+  # Config file
+  file = File.open("backtest/#{strategy}/config.csv", 'w')
+  file.write <<-EOF
+TESTSUIT
+THREADSLIMIT,12
+MARKETFILE,data.sqlite
+OUTPATH,logs
+VARS,indicators.csv
+LOG_VARS,${counter},${prevclose},${prevhi},${prevlow},${avervolume},${Datr},${yatr},${fMav55},${fMa233},${oMav55},${Today},${startatrratio},${entryatrratio},${dayatrratio},${entrytimefromxopen},${entrytimefromhighlow},${entrylegtime},${entryside},${barcolor},${alternativeentry1},${buytrigger},${selltrigger}
+SAVEMARKETFILTERLOGS,true
+
+EOF
+
+  days.each_key do |date|
+    file.write <<-EOF
+TESTCASE
+MARKETDATASOURCE,#{"test_#{date.tr('-', '')}"}
+SEARCHPATH,#{"test_#{date.tr('-', '')}"}
+MARKETFILE,-
+MARKETFILTER,-
+VARS,-
+ORDERSIZE,-
+RANGES,-
+STRATEGY,STRATEGY_NAME_HERE.csv
+EOF
+  end
 end
