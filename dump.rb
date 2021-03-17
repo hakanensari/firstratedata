@@ -18,21 +18,14 @@ sql_template_for_indicators = File.read('sql/export_indicators_to_atrader.sql')
 
   # Picks
   dataset = pg[:earning_picks].where{date > '2019-01-01'}
-  days = dataset.reduce({}) do |memo, pick|
+  picks = dataset.reduce({}) do |memo, pick|
     date = strategy == 'earnings' ? pick[:date].iso8601 : (pick[:date] + 1).iso8601
     (memo[date] ||= []) << pick[:symbol]
     memo
   end
+  dates_picked = []
 
-  # Metadata
-  sqlite.create_table :atrader_metadata do
-    String :name, null: false
-    Float :info, null: false
-  end
-  data = days.map { |date, _| { name: "test_#{date.tr('-', '')}", info: 1.2 } }
-  sqlite[:atrader_metadata].multi_insert(data)
-
-  days.each do |date, symbols|
+  picks.each do |date, symbols|
     # Ticks
     sqlite.create_table "test_#{date.tr('-', '')}" do
       Integer :printtime, null: false
@@ -65,6 +58,10 @@ sql_template_for_indicators = File.read('sql/export_indicators_to_atrader.sql')
         sale_condition: record[:sale_conditions]
       }
     end
+    if data.empty?
+      puts "#{strategy}/#{date} has no data"
+      next
+    end
     sqlite["test_#{date.tr('-', '')}".to_sym].multi_insert(data)
 
     # Indicators
@@ -73,18 +70,22 @@ sql_template_for_indicators = File.read('sql/export_indicators_to_atrader.sql')
         .gsub('{{symbol}}', "symbol=any('{#{symbols.join(',')}}')")
         .gsub('{{datetime}}', "'#{date}'")
     data = pg.fetch(sql)
-
-    if data.empty?
-      puts "#{strategy}/#{date} has no data"
-      next
-    end
-
     CSV.open("backtest/#{strategy}/test_#{date.tr('-', '')}/indicators.csv", 'wb', write_headers: true, headers: data.first.keys) do |csv|
       data.each do |record|
         csv << record.values.map { |val| val.is_a?(BigDecimal) ? val.to_f : val }
       end
     end
+
+    dates_picked << date
   end
+
+  # Metadata
+  sqlite.create_table :atrader_metadata do
+    String :name, null: false
+    Float :info, null: false
+  end
+  data = dates_picked.map { |date| { name: "test_#{date.tr('-', '')}", info: 1.2 } }
+  sqlite[:atrader_metadata].multi_insert(data)
 
   # Config file
   file = File.open("backtest/#{strategy}/config.csv", 'w')
@@ -99,7 +100,7 @@ SAVEMARKETFILTERLOGS,true
 
 EOF
 
-  days.each_key do |date|
+  dates_picked.each do |date|
     file.write <<-EOF
 TESTCASE
 MARKETDATASOURCE,#{"test_#{date.tr('-', '')}"}
