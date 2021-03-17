@@ -42,7 +42,7 @@ sql_template_for_indicators = File.read('sql/export_indicators_to_atrader.sql')
       Float :bid, null: false
       Float :ask, null: false
       Float :pclose, null: false
-      Integer :printsize, null: false
+      Integer :print_size, null: false
       String :sale_condition, null: false
     end
     sql = sql_template_for_ticks
@@ -59,7 +59,7 @@ sql_template_for_indicators = File.read('sql/export_indicators_to_atrader.sql')
         bid: record[:bid],
         ask: record[:bid],
         pclose: record[:bid],
-        printsize: record[:print_size],
+        print_size: record[:print_size],
         sale_condition: record[:sale_conditions]
       }
     end
