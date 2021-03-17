@@ -100,7 +100,7 @@ SAVEMARKETFILTERLOGS,true
 
 EOF
 
-  dates_picked.each do |date|
+  dates_picked.sort.each do |date|
     file.write <<-EOF
 TESTCASE
 MARKETDATASOURCE,#{"test_#{date.tr('-', '')}"}
