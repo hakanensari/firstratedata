@@ -19,7 +19,12 @@ sql_template_for_indicators = File.read('sql/export_indicators_to_atrader.sql')
   # Picks
   dataset = pg[:earning_picks].where{date > '2019-01-01'}
   picks = dataset.reduce({}) do |memo, pick|
-    date = strategy == 'earnings' ? pick[:date].iso8601 : (pick[:date] + 1).iso8601
+    date =
+      if strategy == 'earnings'
+        date = pick[:date].iso8601
+      else
+        pg[:stocks_1m].where{datetime>=pick[:date] + 1}.order(:datetime).limit(1).select_map(:datetime).first.iso8601
+      end
     (memo[date] ||= []) << pick[:symbol]
     memo
   end
