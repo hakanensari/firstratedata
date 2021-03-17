@@ -86,7 +86,7 @@ services:
       - "80:80"
       - "443:443"
     labels:
-      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
     volumes:
       - conf:/etc/nginx/conf.d
       - vhost:/etc/nginx/vhost.d
@@ -94,6 +94,7 @@ services:
       - dhparam:/etc/nginx/dhparam
       - certs:/etc/nginx/certs:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
+    restart: always
 
   letsencrypt-nginx-proxy-companion:
     image: jrcs/letsencrypt-nginx-proxy-companion
@@ -106,6 +107,7 @@ services:
       - certs:/etc/nginx/certs
       - acme:/etc/acme.sh
       - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: always
 
 volumes:
   db-data:
