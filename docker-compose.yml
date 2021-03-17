@@ -13,8 +13,8 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: TKy36eLZ!WL-.Biv@
       GF_USERS_ALLOW_SIGN_UP: "false"
       LETSENCRYPT_EMAIL: hakanensari@gmail.com
-      LETSENCRYPT_HOST: grafana.a.lineofflig.ht
-      VIRTUAL_HOST: grafana.a.lineofflig.ht
+      LETSENCRYPT_HOST: grafana.app.a.lineofflig.ht
+      VIRTUAL_HOST: grafana.app.a.lineofflig.ht
 
   metabase:
     image: metabase/metabase
@@ -27,9 +27,9 @@ services:
     environment:
       JAVA_TOOL_OPTIONS: -Xmx4g
       LETSENCRYPT_EMAIL: hakanensari@gmail.com
-      LETSENCRYPT_HOST: metabase.a.lineofflig.ht
+      LETSENCRYPT_HOST: metabase.app.a.lineofflig.ht
       MB_DB_FILE: /data/metabase.db
-      VIRTUAL_HOST: metabase.a.lineofflig.ht
+      VIRTUAL_HOST: metabase.app.a.lineofflig.ht
 
   db:
     image: timescale/timescaledb:latest-pg13
