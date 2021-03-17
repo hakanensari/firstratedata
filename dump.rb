@@ -18,16 +18,16 @@ sql_template_for_indicators = File.read('sql/export_indicators_to_atrader.sql')
 
   # Picks
   dataset = pg[:earning_picks].where{date > '2019-01-01'}
+  cached_date_conversions = {}
   picks = dataset.reduce({}) do |memo, pick|
     date =
       if strategy == 'earnings'
         date = pick[:date].iso8601
       else
-        cached_date_conversions ||= {}
-        if cached_date_conversions.key?(pick[:date])
-          cached_date_conversions[pick[:date]]
+        if cached_date_conversions.key?(pick[:date].iso8601)
+          cached_date_conversions[pick[:date].iso8601]
         else
-          cached_date_conversions[pick[:date]] =
+          cached_date_conversions[pick[:date].iso8601] =
             pg[:stocks_1m]
               .where{datetime>=pick[:date] + 1}
               .order(:datetime)
