@@ -4,7 +4,7 @@ x-superset-depends-on: &superset-depends-on
   - redis
 x-superset-volumes: &superset-volumes
   # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
-  - ./superset/docker:/app/docker
+  - ./docker:/app/docker
   - superset_home:/app/superset_home
 
 version: "3.8"
@@ -17,7 +17,7 @@ services:
       - redis:/data
 
   db-superset:
-    env_file: superset/docker/.env
+    env_file: docker/.env
     image: postgres:10
     container_name: superset_db
     restart: unless-stopped
@@ -25,7 +25,7 @@ services:
       - db_home:/var/lib/postgresql/data
 
   superset:
-    env_file: superset/docker/.env-non-dev
+    env_file: docker/.env-non-dev
     image: *superset-image
     container_name: superset_app
     restart: unless-stopped
@@ -42,7 +42,7 @@ services:
     image: *superset-image
     container_name: superset_init
     command: ["/app/docker/docker-init.sh"]
-    env_file: superset/docker/.env-non-dev
+    env_file: docker/.env-non-dev
     depends_on: *superset-depends-on
     user: "root"
     volumes: *superset-volumes
@@ -51,7 +51,7 @@ services:
     image: *superset-image
     container_name: superset_worker
     command: ["/app/docker/docker-bootstrap.sh", "worker"]
-    env_file: superset/docker/.env-non-dev
+    env_file: docker/.env-non-dev
     restart: unless-stopped
     depends_on: *superset-depends-on
     user: "root"
@@ -61,7 +61,7 @@ services:
     image: *superset-image
     container_name: superset_worker_beat
     command: ["/app/docker/docker-bootstrap.sh", "beat"]
-    env_file: superset/docker/.env-non-dev
+    env_file: docker/.env-non-dev
     restart: unless-stopped
     depends_on: *superset-depends-on
     user: "root"
