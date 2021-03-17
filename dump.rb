@@ -99,7 +99,12 @@ TESTSUIT
 THREADSLIMIT,12
 MARKETFILE,data.sqlite
 OUTPATH,logs
+#SKIPSCRIPTLOGS
+#MARKETFILTER,marketfilter.csv
+#MARKETFILTERVARS,marketfiltervars.csv
 VARS,indicators.csv
+#ORDERSIZE,ordersize.csv
+#RANGES,ranges.csv
 LOG_VARS,${counter},${prevclose},${prevhi},${prevlow},${avervolume},${Datr},${yatr},${fMav55},${fMa233},${oMav55},${Today},${startatrratio},${entryatrratio},${dayatrratio},${entrytimefromxopen},${entrytimefromhighlow},${entrylegtime},${entryside},${barcolor},${alternativeentry1},${buytrigger},${selltrigger}
 SAVEMARKETFILTERLOGS,true
 
