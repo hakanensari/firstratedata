@@ -89,26 +89,32 @@ services:
       - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
     volumes:
       - ./proxy.conf:/etc/nginx/proxy.conf:ro
-      - /etc/nginx/conf.d
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - certs:/etc/nginx/certs:ro
+      - conf:/etc/nginx/conf.d
+      - vhost:/etc/nginx/vhost.d
       - html:/usr/share/nginx/html
-      - vhost.d:/etc/nginx/vhost.d
+      - dhparam:/etc/nginx/dhparam
+      - certs:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
 
   letsencrypt-nginx-proxy-companion:
     image: jrcs/letsencrypt-nginx-proxy-companion
     depends_on:
       - nginx-proxy
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - certs:/etc/nginx/certs:rw
+      - vhost:/etc/nginx/vhost.d
       - html:/usr/share/nginx/html
-      - vhost.d:/etc/nginx/vhost.d
+      - dhparam:/etc/nginx/dhparam:ro
+      - certs:/etc/nginx/certs
+      - acme:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
 
 volumes:
   db-data:
   grafana-data:
   metabase-data:
-  certs:
+  conf:
+  vhost:
   html:
-  vhost.d:
+  dhparam:
+  certs:
+  acme:
