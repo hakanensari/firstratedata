@@ -21,7 +21,7 @@ synthetic_dataset AS (
 		EXTRACT(EPOCH FROM CAST(datetime AS time)) AS printtime,
 		symbol AS "name",
 		open AS "last",
-		(volume / 20)::INT AS print_size
+		CAST(volume / 16 AS int) AS print_size
 	FROM first_hour
 	UNION ALL
 	SELECT
@@ -71,7 +71,7 @@ synthetic_dataset AS (
 			WHEN open > "close" THEN high
 			ELSE low
 		END AS "last",
-		(volume / 6)::INT AS print_size
+		CAST(volume / 16 AS int) AS print_size
 	FROM first_hour
 	UNION ALL
 	SELECT
@@ -121,7 +121,7 @@ synthetic_dataset AS (
 			WHEN open > "close" THEN low
 			ELSE high
 		END AS "last",
-		(volume / 6)::INT AS print_size
+		CAST(volume / 16 AS int) AS print_size
 	FROM first_hour
 	UNION ALL
 	SELECT
@@ -177,7 +177,7 @@ synthetic_dataset AS (
 		EXTRACT(EPOCH FROM datetime::TIME) AS printtime,
 		symbol AS "name",
 		open AS "last",
-		(volume / 6)::INT AS print_size
+		CAST(volume / 6 AS int) AS print_size
 	FROM remaining_hours
 	UNION ALL
 	SELECT
@@ -187,7 +187,7 @@ synthetic_dataset AS (
 			WHEN open > "close" THEN least(high, lag(high) OVER (PARTITION BY symbol ORDER BY datetime))
 			ELSE greatest(low, lag(low) OVER (PARTITION BY symbol ORDER BY datetime))
 		END AS "last",
-		(volume / 6)::INT AS print_size
+		CAST(volume / 6 AS int) AS print_size
 	FROM remaining_hours
 	UNION ALL
 	SELECT
@@ -197,7 +197,7 @@ synthetic_dataset AS (
 			WHEN open > "close" THEN high
 			ELSE low
 		END AS "last",
-		(volume / 6)::INT AS print_size
+		CAST(volume / 6 AS int) AS print_size
 	FROM remaining_hours
 	UNION ALL
 	SELECT
@@ -207,7 +207,7 @@ synthetic_dataset AS (
 			WHEN open > "close" THEN greatest(low, lag(low) OVER (PARTITION BY symbol ORDER BY datetime))
 			ELSE least(high, lag(high) OVER (PARTITION BY symbol ORDER BY datetime))
 		END AS "last",
-		(volume / 6)::INT AS print_size
+		CAST(volume / 6 AS int) AS print_size
 	FROM remaining_hours
 	UNION ALL
 	SELECT
@@ -217,14 +217,14 @@ synthetic_dataset AS (
 			WHEN open > "close" THEN low
 			ELSE high
 		END AS "last",
-		(volume / 6)::INT AS print_size
+		CAST(volume / 6 AS int) AS print_size
 	FROM remaining_hours
 	UNION ALL
 	SELECT
 		EXTRACT(EPOCH FROM datetime::TIME) + 50 AS printtime,
 		symbol AS "name",
 		"close" AS "last",
-		(volume / 6)::INT AS print_size
+		CAST(volume / 6 AS int) AS print_size
 	FROM remaining_hours
 )
 SELECT
