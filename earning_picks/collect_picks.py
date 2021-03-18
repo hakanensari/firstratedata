@@ -2,7 +2,6 @@
 
 import csv
 import datetime
-import glob
 import os
 import re
 import sys
@@ -32,8 +31,7 @@ for entry in os.scandir(path):
 
         date = datetime.datetime.strptime(f'{year} {month} {day.zfill(2)}', "%Y %B %d").date()
 
-        path = glob.glob(f'{entry.path}/*.csv')[0]
-        csvfile = open(path)
+        csvfile = open(f'{entry.path}/tiny(70000).csv')
         reader = csv.reader(csvfile)
 
         for row in reader:
