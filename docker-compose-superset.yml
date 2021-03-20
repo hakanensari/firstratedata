@@ -35,8 +35,8 @@ services:
     volumes: *superset-volumes
     environment:
       LETSENCRYPT_EMAIL: hakanensari@gmail.com
-      LETSENCRYPT_HOST: superset.a.lineofflig.ht
-      VIRTUAL_HOST: superset.a.lineofflig.ht
+      LETSENCRYPT_HOST: superset.app.a.lineofflig.ht
+      VIRTUAL_HOST: superset.app.a.lineofflig.ht
 
   superset-init:
     image: *superset-image
