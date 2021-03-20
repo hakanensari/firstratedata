@@ -1,6 +1,18 @@
 version: "3.8"
 
 services:
+  scipy:
+    image: jupyter/scipy-notebook
+    expose:
+      - "8888"
+    links:
+      - db
+    environment:
+      JUPYTER_TOKEN: KsL6EsCygGQFSLkw
+      LETSENCRYPT_EMAIL: hakanensari@gmail.com
+      LETSENCRYPT_HOST: scipy.a.lineofflig.ht
+      VIRTUAL_HOST: scipy.a.lineofflig.ht
+
   grafana:
     image: grafana/grafana:latest
     expose:
