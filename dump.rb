@@ -18,6 +18,15 @@ sql_template_for_indicators = File.read('sql/export_indicators_to_atrader.sql')
 
   # Picks
   dataset = pg[:earning_picks].where{date > '2019-01-01'}
+
+  if ARGV[1] == 's'
+    # Calculate a sample size using Slovin's formula
+    population_size = dataset.count
+    sample_size = (population_size / (1 + population_size * 0.05 ** 2)).round
+
+    dataset = dataset.all.sample(sample_size)
+  end
+
   cached_date_conversions = {}
   picks = dataset.reduce({}) do |memo, pick|
     date =
