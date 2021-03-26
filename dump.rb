@@ -17,14 +17,33 @@ sql_template_for_indicators = File.read('sql/export_indicators_to_atrader.sql')
   pg = Sequel.connect(ARGV[0])
 
   # Picks
-  dataset = pg[:earning_picks].where{date > '2019-01-01'}
+  #
+  # We exclude stocks who have no ticks or just one tick in the first minute. The latter implies a stock may still be
+  # trading pre-market, which we cannot figure out from bar data.
+  pg.extension :date_arithmetic
+    dataset = pg[:picks]
+      .with(:picks,
+            pg[:earning_picks]
+              .select(:symbol,
+                      :date,
+                      pg[:stocks_1m]
+                        .select(Sequel.as(Sequel.lit('high - low'), :highlowdiff))
+                        .where{{symbol: earning_picks[:symbol],
+                                datetime: Sequel.date_add(earning_picks[:date], hours: 9, minutes: 30)}}
+                        .limit(1))
+              .where{date > '2019-01-01'},
+            materialized: true)
+      .select(:date, :symbol)
+      .where{highlowdiff > 0}
+      .exclude(highlowdiff: nil)
+      .all
 
+  # Build a smaller sample
   if ARGV[1] == 's'
-    # Calculate a sample size using Slovin's formula
+    # Slovin's formula
     population_size = dataset.count
     sample_size = (population_size / (1 + population_size * 0.05 ** 2)).round
-
-    dataset = dataset.all.sample(sample_size)
+    dataset = dataset.sample(sample_size)
   end
 
   cached_date_conversions = {}
