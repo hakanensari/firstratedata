@@ -29,7 +29,7 @@ services:
       VIRTUAL_HOST: grafana.alineofflig.ht,grafana.app.a.lineofflig.ht
 
   metabase:
-    image: metabase/metabase
+    build: ./docker/metabase
     expose:
       - "3000"
     volumes:
