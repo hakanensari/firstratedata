@@ -4,7 +4,7 @@ x-superset-depends-on: &superset-depends-on
   - redis
 x-superset-volumes: &superset-volumes
   # /app/pythonpath_docker will be appended to the PYTHONPATH in the final container
-  - ./docker:/app/docker
+  - ./docker/superset:/app/docker
   - superset_home:/app/superset_home
 
 version: "3.8"
