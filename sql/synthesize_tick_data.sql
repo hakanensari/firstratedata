@@ -2,8 +2,8 @@ WITH dataset AS (
 	SELECT *
 	FROM assets_1m_rth
 	WHERE {{symbol}}
-	AND datetime >= {{datetime}}
-	AND datetime < CAST({{datetime}} AS timestamp) + interval '1 day'
+	AND datetime >= {{startdate}}
+	AND datetime < CAST({{enddate}} AS timestamp) + interval '1 day'
 ),
 dataset_with_volume_equal_to_or_above_1600 AS (
 	SELECT *
