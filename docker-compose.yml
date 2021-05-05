@@ -10,7 +10,7 @@ x-app: &default-app
 services:
   jupyter-lab:
     <<: *default-app
-    image: jupyter/datascience-notebook
+    image: rubydata/datascience-notebook
     expose:
       - "8888"
     volumes:
