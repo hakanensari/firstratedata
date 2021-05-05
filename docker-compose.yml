@@ -1,35 +1,30 @@
 version: "3.8"
 
+x-app: &default-app
+  restart: "unless-stopped"
+  logging:
+      driver: "json-file"
+      options:
+        max-size: "2048m"
+
 services:
-  scipy:
-    image: jupyter/scipy-notebook
+  jupyter-lab:
+    <<: *default-app
+    image: jupyter/datascience-notebook
     expose:
       - "8888"
-    links:
-      - db
-    environment:
-      JUPYTER_TOKEN: KsL6EsCygGQFSLkw
-      LETSENCRYPT_EMAIL: hakanensari@gmail.com
-      LETSENCRYPT_HOST: scipy.a.lineofflig.ht
-      VIRTUAL_HOST: scipy.a.lineofflig.ht
-
-  grafana:
-    image: grafana/grafana:latest
-    expose:
-      - "3000"
     volumes:
-      - grafana-data:/var/lib/grafana
+      - jupyter-lab-work:/home/jovyan/work
     links:
       - db
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: TKy36eLZ!WL-.Biv@
-      GF_USERS_ALLOW_SIGN_UP: "false"
-      LETSENCRYPT_EMAIL: hakanensari@gmail.com
-      LETSENCRYPT_HOST: grafana.alineofflig.ht,grafana.app.a.lineofflig.ht
-      VIRTUAL_HOST: grafana.alineofflig.ht,grafana.app.a.lineofflig.ht
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=KsL6EsCygGQFSLkw
+      - LETSENCRYPT_HOST=lab.rhizo.me
+      - VIRTUAL_HOST=lab.rhizo.me
 
   metabase:
-    build: ./docker/metabase
+    image: metabase/metabase
     expose:
       - "3000"
     volumes:
@@ -37,11 +32,10 @@ services:
     links:
       - db
     environment:
-      JAVA_TOOL_OPTIONS: -Xmx4g
-      LETSENCRYPT_EMAIL: hakanensari@gmail.com
-      LETSENCRYPT_HOST: metabase.a.lineofflig.ht,metabase.app.a.lineofflig.ht
-      MB_DB_FILE: /data/metabase.db
-      VIRTUAL_HOST: metabase.a.lineofflig.ht,metabase.app.a.lineofflig.ht
+      - JAVA_TOOL_OPTIONS=-Xmx4g
+      - MB_DB_FILE=/data/metabase.db
+      - LETSENCRYPT_HOST=metabase.rhizo.me
+      - VIRTUAL_HOST=metabase.rhizo.me
 
   db:
     image: timescale/timescaledb:latest-pg13
@@ -50,7 +44,7 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
+      - POSTGRES_HOST_AUTH_METHOD=trust
     command:
       - "postgres"
       - "-c"
@@ -106,10 +100,9 @@ services:
       - dhparam:/etc/nginx/dhparam
       - certs:/etc/nginx/certs:ro
       - /var/run/docker.sock:/tmp/docker.sock:ro
-    restart: always
 
   letsencrypt-nginx-proxy-companion:
-    image: jrcs/letsencrypt-nginx-proxy-companion
+    image: nginxproxy/acme-companion
     depends_on:
       - nginx-proxy
     volumes:
@@ -119,11 +112,12 @@ services:
       - certs:/etc/nginx/certs
       - acme:/etc/acme.sh
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    restart: always
+    environment:
+      DEFAULT_EMAIL: me@hakanensari.com
 
 volumes:
+  jupyter-lab-work:
   db-data:
-  grafana-data:
   metabase-data:
   conf:
   vhost:
