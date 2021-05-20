@@ -14,7 +14,7 @@ services:
     expose:
       - "8888"
     volumes:
-      - jupyter-lab-work:/home/jovyan/work
+      - ./notebooks:/home/jovyan/work
     links:
       - db
     environment:
@@ -116,7 +116,6 @@ services:
       DEFAULT_EMAIL: me@hakanensari.com
 
 volumes:
-  jupyter-lab-work:
   db-data:
   metabase-data:
   conf:
