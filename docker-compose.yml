@@ -10,7 +10,7 @@ x-app: &default-app
 services:
   jupyter-lab:
     <<: *default-app
-    image: jupyter/datascience-notebook
+    build: .
     expose:
       - "8888"
     volumes:
@@ -18,7 +18,6 @@ services:
     links:
       - db
     environment:
-      - JUPYTER_ENABLE_LAB=yes
       - JUPYTER_TOKEN=KsL6EsCygGQFSLkw
       - LETSENCRYPT_HOST=lab.rhizo.me
       - VIRTUAL_HOST=lab.rhizo.me
