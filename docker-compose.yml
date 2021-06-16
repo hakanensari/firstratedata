@@ -14,7 +14,8 @@ services:
     expose:
       - "8888"
     volumes:
-      - ./notebooks:/home/jovyan/work
+      - ./jupyter-files/user-settings:/home/jovyan/.jupyter/lab/user-settings
+      - ./jupyter-files/work:/home/jovyan/work
     links:
       - db
     environment:
