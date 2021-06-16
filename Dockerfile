@@ -18,4 +18,7 @@ RUN pip install \
     	black \
     	isort
 
+RUN pip install \
+        jupyterlab-git
+
 CMD ["start.sh", "jupyter", "lab"]
